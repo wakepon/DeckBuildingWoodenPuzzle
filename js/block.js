@@ -75,8 +75,8 @@ var BlockManager = {
 
         const rows = block.shape.length;
         const cols = block.shape[0].length;
-        blockDiv.style.gridTemplateColumns = `repeat(${cols}, auto)`;
-        blockDiv.style.gridTemplateRows = `repeat(${rows}, auto)`;
+        blockDiv.style.gridTemplateColumns = `repeat(${cols}, 30px)`;
+        blockDiv.style.gridTemplateRows = `repeat(${rows}, 30px)`;
 
         block.shape.forEach(row => {
             row.forEach(cell => {
