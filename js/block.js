@@ -61,44 +61,60 @@ var BlockManager = {
 
         this.currentBlocks.forEach(block => {
             if (!block.placed) {
-                const blockElement = this.createBlockElement(block);
-                container.appendChild(blockElement);
+                this.renderBlock(container, block);
             }
         });
     },
 
-    // ブロック要素の作成
-    createBlockElement: function(block) {
+    // ストックエリアにブロックを描画（ボードの描画方式を参考に実装）
+    renderBlock: function(container, block) {
+        // ブロックのコンテナ要素を作成
         const blockDiv = document.createElement('div');
         blockDiv.className = 'block';
         blockDiv.dataset.blockId = block.id;
 
+        // グリッドレイアウトの設定
         const rows = block.shape.length;
         const cols = block.shape[0].length;
         blockDiv.style.gridTemplateColumns = `repeat(${cols}, 30px)`;
         blockDiv.style.gridTemplateRows = `repeat(${rows}, 30px)`;
 
-        block.shape.forEach(row => {
-            row.forEach(cell => {
+        // ブロックの各セルを描画（board.jsのplace関数と同様のパターン）
+        block.shape.forEach((shapeRow, r) => {
+            shapeRow.forEach((cell, c) => {
                 const cellDiv = document.createElement('div');
                 cellDiv.className = 'block-cell';
+                cellDiv.dataset.blockRow = r;
+                cellDiv.dataset.blockCol = c;
+
+                // セルが存在しない場合は非表示に（board.jsではクラス操作で実現）
                 if (!cell) {
                     cellDiv.style.visibility = 'hidden';
                 }
+
                 blockDiv.appendChild(cellDiv);
             });
         });
 
+        // イベントハンドラの設定
+        this.attachBlockEvents(blockDiv, block);
+
+        // コンテナに追加
+        container.appendChild(blockDiv);
+    },
+
+    // ブロックにイベントを設定
+    attachBlockEvents: function(blockElement, block) {
         // マウスイベント
-        blockDiv.addEventListener('mousedown', (e) => InputHandler.startDrag(e, block));
+        blockElement.addEventListener('mousedown', (e) => {
+            InputHandler.startDrag(e, block);
+        });
 
         // タッチイベント
-        blockDiv.addEventListener('touchstart', (e) => {
+        blockElement.addEventListener('touchstart', (e) => {
             e.preventDefault();
             InputHandler.startDrag(e.touches[0], block);
         });
-
-        return blockDiv;
     },
 
     // ブロックが配置可能かチェック
