@@ -30,16 +30,3 @@ jobs:
           claude_access_token: ${{ secrets.CLAUDE_ACCESS_TOKEN }}
           claude_refresh_token: ${{ secrets.CLAUDE_REFRESH_TOKEN }}
           claude_expires_at: ${{ secrets.CLAUDE_EXPIRES_AT }}
-```
-
-4. 下の方にある「Commit changes...」ボタンをクリック
-
-5. そのまま「Commit changes」で確定
-
----
-
-### 完了したら：Step4 テスト！
-
-リポジトリでIssueを新規作成して、本文に：
-```
-@claude このリポジトリの構成を説明してください
