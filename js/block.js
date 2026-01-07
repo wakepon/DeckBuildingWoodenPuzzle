@@ -67,27 +67,38 @@ var BlockManager = {
         });
     },
 
-    // ブロック要素の作成
+    // ブロック要素の作成（ボードの描画処理を参考に実装）
     createBlockElement: function(block) {
         const blockDiv = document.createElement('div');
         blockDiv.className = 'block';
         blockDiv.dataset.blockId = block.id;
 
+        // ブロックの形状サイズを取得
         const rows = block.shape.length;
         const cols = block.shape[0].length;
+
+        // グリッドレイアウトを設定
         blockDiv.style.gridTemplateColumns = `repeat(${cols}, 30px)`;
         blockDiv.style.gridTemplateRows = `repeat(${rows}, 30px)`;
 
-        block.shape.forEach(row => {
-            row.forEach(cell => {
+        // ボードと同様に、各セルをループで作成
+        for (let row = 0; row < rows; row++) {
+            for (let col = 0; col < cols; col++) {
                 const cellDiv = document.createElement('div');
                 cellDiv.className = 'block-cell';
-                if (!cell) {
+
+                // セルの位置情報をdata属性として保存（ボードのパターンを参考）
+                cellDiv.dataset.row = row;
+                cellDiv.dataset.col = col;
+
+                // 形状配列の値に応じて表示/非表示を制御
+                if (!block.shape[row][col]) {
                     cellDiv.style.visibility = 'hidden';
                 }
+
                 blockDiv.appendChild(cellDiv);
-            });
-        });
+            }
+        }
 
         // マウスイベント
         blockDiv.addEventListener('mousedown', (e) => InputHandler.startDrag(e, block));
