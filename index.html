@@ -31,7 +31,7 @@
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
         }
 
-        #score-display {
+        #score-display, #highscore-display {
             background: linear-gradient(135deg, #6d4c41 0%, #5d4037 100%);
             color: #fff;
             font-size: 24px;
@@ -41,6 +41,68 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
             margin-bottom: 10px;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        #highscore-display {
+            font-size: 18px;
+            background: linear-gradient(135deg, #8d6e63 0%, #795548 100%);
+        }
+
+        #game-over-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        #game-over-content {
+            background: linear-gradient(135deg, #8d6e63 0%, #795548 100%);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            color: #fff;
+        }
+
+        #game-over-content h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        #game-over-content div {
+            font-size: 24px;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+
+        #restart-button {
+            background: linear-gradient(135deg, #6d4c41 0%, #5d4037 100%);
+            color: #fff;
+            border: none;
+            padding: 15px 30px;
+            font-size: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        #restart-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        #restart-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         #game-container {
@@ -235,10 +297,20 @@
 <body>
     <h1>Woody Puzzle</h1>
     <div id="score-display">スコア: 0</div>
+    <div id="highscore-display">ハイスコア: 0</div>
 
     <div id="game-container">
         <div id="board"></div>
         <div id="blocks-container"></div>
+    </div>
+
+    <div id="game-over-screen" style="display: none;">
+        <div id="game-over-content">
+            <h2>ゲームオーバー</h2>
+            <div id="final-score"></div>
+            <div id="final-highscore"></div>
+            <button id="restart-button">もう一度遊ぶ</button>
+        </div>
     </div>
 
     <script>
@@ -249,12 +321,35 @@
         let dragPreview = null;
         let currentBlocks = [];
         let score = 0;
+        let highScore = 0;
 
         // ブロックの定義（形状）
         const blockShapes = [
-            [[1]], // 1x1
-            [[1, 1], [1, 1]], // 2x2
-            [[1, 1, 1]] // 3x1
+            // 1x1
+            [[1]],
+
+            // 1x2, 2x1
+            [[1, 1]],
+            [[1], [1]],
+
+            // 1x3, 3x1
+            [[1, 1, 1]],
+            [[1], [1], [1]],
+
+            // 2x2
+            [[1, 1], [1, 1]],
+
+            // 2x3, 3x2
+            [[1, 1, 1], [1, 1, 1]],
+            [[1, 1], [1, 1], [1, 1]],
+
+            // L字型（3パターン）
+            [[1, 0], [1, 0], [1, 1]],
+            [[1, 1], [1, 0], [1, 0]],
+            [[1, 1, 1], [1, 0, 0]],
+
+            // T字型
+            [[1, 1, 1], [0, 1, 0]]
         ];
 
         // ボードの初期化
@@ -273,14 +368,100 @@
             }
         }
 
+        // ハイスコアの読み込み
+        function loadHighScore() {
+            const saved = localStorage.getItem('woodyPuzzleHighScore');
+            if (saved) {
+                highScore = parseInt(saved, 10);
+                document.getElementById('highscore-display').textContent = `ハイスコア: ${highScore}`;
+            }
+        }
+
+        // ハイスコアの保存
+        function saveHighScore() {
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('woodyPuzzleHighScore', highScore.toString());
+                document.getElementById('highscore-display').textContent = `ハイスコア: ${highScore}`;
+            }
+        }
+
+        // ランダムなブロックを選択
+        function getRandomBlocks(count = 3) {
+            const blocks = [];
+            for (let i = 0; i < count; i++) {
+                const randomIndex = Math.floor(Math.random() * blockShapes.length);
+                blocks.push({
+                    id: Date.now() + i,
+                    shape: blockShapes[randomIndex],
+                    placed: false
+                });
+            }
+            return blocks;
+        }
+
         // ブロックの初期化
         function initBlocks() {
-            currentBlocks = blockShapes.map((shape, index) => ({
-                id: index,
-                shape: shape,
-                placed: false
-            }));
+            currentBlocks = getRandomBlocks(3);
             renderBlocks();
+            checkGameOver();
+        }
+
+        // ブロックが配置可能かチェック
+        function canPlaceAnyBlock() {
+            for (const block of currentBlocks) {
+                if (block.placed) continue;
+
+                // ボード上のすべての位置を試す
+                for (let row = 0; row < BOARD_SIZE; row++) {
+                    for (let col = 0; col < BOARD_SIZE; col++) {
+                        if (checkPlacement(row, col, block.shape)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        // ゲームオーバーチェック
+        function checkGameOver() {
+            if (!canPlaceAnyBlock()) {
+                saveHighScore();
+                showGameOver();
+            }
+        }
+
+        // ゲームオーバー画面を表示
+        function showGameOver() {
+            document.getElementById('final-score').textContent = `スコア: ${score}`;
+            document.getElementById('final-highscore').textContent = `ハイスコア: ${highScore}`;
+            document.getElementById('game-over-screen').style.display = 'flex';
+        }
+
+        // ゲームリスタート
+        function restartGame() {
+            // ボードをクリア
+            for (let row = 0; row < BOARD_SIZE; row++) {
+                for (let col = 0; col < BOARD_SIZE; col++) {
+                    board[row][col] = false;
+                }
+            }
+
+            // スコアリセット
+            score = 0;
+            updateScore(0);
+
+            // UIリセット
+            document.getElementById('game-over-screen').style.display = 'none';
+
+            // ボードの見た目をリセット
+            document.querySelectorAll('.cell').forEach(cell => {
+                cell.classList.remove('filled', 'highlight', 'invalid', 'clearing');
+            });
+
+            // 新しいブロックを生成
+            initBlocks();
         }
 
         // ブロックのレンダリング
@@ -583,6 +764,19 @@
 
             // 行・列のクリアチェック
             checkAndClearLines();
+
+            // 3つすべて配置したら新しいブロックを生成
+            const allPlaced = currentBlocks.every(b => b.placed);
+            if (allPlaced) {
+                setTimeout(() => {
+                    currentBlocks = getRandomBlocks(3);
+                    renderBlocks();
+                    checkGameOver();
+                }, 600); // クリアアニメーション後に生成
+            } else {
+                // まだ配置していないブロックがある場合もゲームオーバーチェック
+                checkGameOver();
+            }
         }
 
         // ドラッグ終了
@@ -627,8 +821,12 @@
         }
 
         // ゲームの初期化
+        loadHighScore();
         initBoard();
         initBlocks();
+
+        // リスタートボタンのイベントリスナー
+        document.getElementById('restart-button').addEventListener('click', restartGame);
     </script>
 </body>
 </html>
