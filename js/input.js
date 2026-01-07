@@ -14,8 +14,8 @@ var InputHandler = {
         this.dragPreview.className = 'drag-preview';
         const rows = block.shape.length;
         const cols = block.shape[0].length;
-        this.dragPreview.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-        this.dragPreview.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+        this.dragPreview.style.gridTemplateColumns = `repeat(${cols}, auto)`;
+        this.dragPreview.style.gridTemplateRows = `repeat(${rows}, auto)`;
 
         block.shape.forEach(row => {
             row.forEach(cell => {
