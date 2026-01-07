@@ -31,6 +31,18 @@
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
         }
 
+        #score-display {
+            background: linear-gradient(135deg, #6d4c41 0%, #5d4037 100%);
+            color: #fff;
+            font-size: 24px;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
         #game-container {
             display: flex;
             flex-direction: column;
@@ -72,6 +84,25 @@
 
         .cell.invalid {
             background: linear-gradient(135deg, #ef5350 0%, #e53935 100%);
+        }
+
+        .cell.clearing {
+            animation: fadeOut 0.5s ease-out forwards;
+        }
+
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(1.1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
         }
 
         #blocks-container {
@@ -203,6 +234,7 @@
 </head>
 <body>
     <h1>Woody Puzzle</h1>
+    <div id="score-display">スコア: 0</div>
 
     <div id="game-container">
         <div id="board"></div>
@@ -216,6 +248,7 @@
         let draggedBlock = null;
         let dragPreview = null;
         let currentBlocks = [];
+        let score = 0;
 
         // ブロックの定義（形状）
         const blockShapes = [
@@ -422,11 +455,111 @@
             return true;
         }
 
+        // スコア更新
+        function updateScore(points) {
+            score += points;
+            document.getElementById('score-display').textContent = `スコア: ${score}`;
+        }
+
+        // 完成した行・列をチェック
+        function checkAndClearLines() {
+            const rowsToClear = [];
+            const colsToClear = [];
+
+            // 行のチェック
+            for (let row = 0; row < BOARD_SIZE; row++) {
+                if (board[row].every(cell => cell)) {
+                    rowsToClear.push(row);
+                }
+            }
+
+            // 列のチェック
+            for (let col = 0; col < BOARD_SIZE; col++) {
+                let isComplete = true;
+                for (let row = 0; row < BOARD_SIZE; row++) {
+                    if (!board[row][col]) {
+                        isComplete = false;
+                        break;
+                    }
+                }
+                if (isComplete) {
+                    colsToClear.push(col);
+                }
+            }
+
+            // クリア処理
+            if (rowsToClear.length > 0 || colsToClear.length > 0) {
+                clearLines(rowsToClear, colsToClear);
+            }
+        }
+
+        // 行・列をクリア
+        function clearLines(rows, cols) {
+            // アニメーション用のセルを収集
+            const cellsToClear = new Set();
+
+            rows.forEach(row => {
+                for (let col = 0; col < BOARD_SIZE; col++) {
+                    cellsToClear.add(`${row}-${col}`);
+                }
+            });
+
+            cols.forEach(col => {
+                for (let row = 0; row < BOARD_SIZE; row++) {
+                    cellsToClear.add(`${row}-${col}`);
+                }
+            });
+
+            // アニメーション開始
+            cellsToClear.forEach(key => {
+                const [row, col] = key.split('-').map(Number);
+                const cellElement = document.querySelector(
+                    `[data-row="${row}"][data-col="${col}"]`
+                );
+                if (cellElement) {
+                    cellElement.classList.add('clearing');
+                }
+            });
+
+            // アニメーション終了後にクリア
+            setTimeout(() => {
+                cellsToClear.forEach(key => {
+                    const [row, col] = key.split('-').map(Number);
+                    board[row][col] = false;
+                    const cellElement = document.querySelector(
+                        `[data-row="${row}"][data-col="${col}"]`
+                    );
+                    if (cellElement) {
+                        cellElement.classList.remove('filled', 'clearing');
+                    }
+                });
+
+                // スコア計算
+                const totalLines = rows.length + cols.length;
+                let points = 0;
+
+                if (totalLines === 1) {
+                    points = 100;
+                } else if (totalLines === 2) {
+                    points = 300;
+                } else if (totalLines === 3) {
+                    points = 500;
+                } else if (totalLines >= 4) {
+                    points = 500 + (totalLines - 3) * 200;
+                }
+
+                updateScore(points);
+            }, 500);
+        }
+
         // ブロックを配置
         function placeBlock(row, col, block) {
+            let cellCount = 0;
+
             block.shape.forEach((shapeRow, r) => {
                 shapeRow.forEach((cell, c) => {
                     if (cell) {
+                        cellCount++;
                         const targetRow = row + r;
                         const targetCol = col + c;
                         board[targetRow][targetCol] = true;
@@ -442,8 +575,14 @@
                 });
             });
 
+            // 配置スコア（マス数 × 10点）
+            updateScore(cellCount * 10);
+
             block.placed = true;
             renderBlocks();
+
+            // 行・列のクリアチェック
+            checkAndClearLines();
         }
 
         // ドラッグ終了
