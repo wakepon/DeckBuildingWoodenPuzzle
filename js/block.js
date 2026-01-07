@@ -81,12 +81,9 @@ var BlockManager = {
         block.shape.forEach(row => {
             row.forEach(cell => {
                 const cellDiv = document.createElement('div');
-                if (cell) {
-                    cellDiv.className = 'block-cell';
-                } else {
+                cellDiv.className = 'block-cell';
+                if (!cell) {
                     cellDiv.style.visibility = 'hidden';
-                    cellDiv.style.width = '30px';
-                    cellDiv.style.height = '30px';
                 }
                 blockDiv.appendChild(cellDiv);
             });
