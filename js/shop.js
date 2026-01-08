@@ -98,8 +98,16 @@ var Shop = {
         const rows = block.shape.length;
         const cols = block.shape[0].length;
 
-        blockDiv.style.gridTemplateColumns = `repeat(${cols}, 35px)`;
-        blockDiv.style.gridTemplateRows = `repeat(${rows}, 35px)`;
+        // 画面幅に応じてセルサイズを調整
+        let cellSize = 35;
+        if (window.innerWidth <= 380) {
+            cellSize = 25;
+        } else if (window.innerWidth <= 480) {
+            cellSize = 28;
+        }
+
+        blockDiv.style.gridTemplateColumns = `repeat(${cols}, ${cellSize}px)`;
+        blockDiv.style.gridTemplateRows = `repeat(${rows}, ${cellSize}px)`;
 
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
