@@ -18,6 +18,9 @@ function restartGame() {
     // UIリセット
     GameUI.hideGameOver();
 
+    // ラウンドをリセット
+    BlockManager.gameState.round = 1;
+
     // 新しいブロックを生成
     BlockManager.init();
 }
