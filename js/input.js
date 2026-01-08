@@ -56,15 +56,17 @@ var InputHandler = {
         if (!InputHandler.draggedBlock) return;
         e.preventDefault();
         const touch = e.touches[0];
-        InputHandler.updateDragPreview(touch.clientX, touch.clientY);
+        InputHandler.updateDragPreview(touch.clientX, touch.clientY, true);
         InputHandler.highlightCells(touch.clientX, touch.clientY);
     },
 
     // ドラッグプレビューの更新
-    updateDragPreview: function(x, y) {
+    updateDragPreview: function(x, y, isTouch) {
         if (this.dragPreview) {
             this.dragPreview.style.left = (x - 40) + 'px';
-            this.dragPreview.style.top = (y - 40) + 'px';
+            // タッチ操作の場合はオフセットを適用
+            const offsetY = isTouch ? CONFIG.TOUCH_DRAG_OFFSET_Y : 0;
+            this.dragPreview.style.top = (y - 40 - offsetY) + 'px';
         }
     },
 
