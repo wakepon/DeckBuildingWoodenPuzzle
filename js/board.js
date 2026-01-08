@@ -1,17 +1,22 @@
-// board.js - ボード（10x10グリッド）の管理
+// board.js - ボード（NxNグリッド）の管理
 
 // ゲームボードの状態を管理するオブジェクト
 var GameBoard = {
-    BOARD_SIZE: 10,
-    board: Array(10).fill(null).map(() => Array(10).fill(false)),
+    board: [],
 
     // ボードの初期化
     init: function() {
+        // ボード配列を動的に初期化
+        this.board = Array(CONFIG.BOARD_SIZE).fill(null).map(() => Array(CONFIG.BOARD_SIZE).fill(false));
+
         const boardElement = document.getElementById('board');
         boardElement.innerHTML = '';
 
-        for (let row = 0; row < this.BOARD_SIZE; row++) {
-            for (let col = 0; col < this.BOARD_SIZE; col++) {
+        // グリッドの列数を動的に設定
+        boardElement.style.gridTemplateColumns = `repeat(${CONFIG.BOARD_SIZE}, 1fr)`;
+
+        for (let row = 0; row < CONFIG.BOARD_SIZE; row++) {
+            for (let col = 0; col < CONFIG.BOARD_SIZE; col++) {
                 const cell = document.createElement('div');
                 cell.className = 'cell';
                 cell.dataset.row = row;
@@ -23,8 +28,8 @@ var GameBoard = {
 
     // ボードをクリア
     clear: function() {
-        for (let row = 0; row < this.BOARD_SIZE; row++) {
-            for (let col = 0; col < this.BOARD_SIZE; col++) {
+        for (let row = 0; row < CONFIG.BOARD_SIZE; row++) {
+            for (let col = 0; col < CONFIG.BOARD_SIZE; col++) {
                 this.board[row][col] = false;
             }
         }
@@ -44,8 +49,8 @@ var GameBoard = {
                     const targetCol = col + c;
 
                     // ボードの範囲外
-                    if (targetRow < 0 || targetRow >= this.BOARD_SIZE ||
-                        targetCol < 0 || targetCol >= this.BOARD_SIZE) {
+                    if (targetRow < 0 || targetRow >= CONFIG.BOARD_SIZE ||
+                        targetCol < 0 || targetCol >= CONFIG.BOARD_SIZE) {
                         return false;
                     }
 
@@ -91,16 +96,16 @@ var GameBoard = {
         const colsToClear = [];
 
         // 行のチェック
-        for (let row = 0; row < this.BOARD_SIZE; row++) {
+        for (let row = 0; row < CONFIG.BOARD_SIZE; row++) {
             if (this.board[row].every(cell => cell)) {
                 rowsToClear.push(row);
             }
         }
 
         // 列のチェック
-        for (let col = 0; col < this.BOARD_SIZE; col++) {
+        for (let col = 0; col < CONFIG.BOARD_SIZE; col++) {
             let isComplete = true;
-            for (let row = 0; row < this.BOARD_SIZE; row++) {
+            for (let row = 0; row < CONFIG.BOARD_SIZE; row++) {
                 if (!this.board[row][col]) {
                     isComplete = false;
                     break;
@@ -126,7 +131,7 @@ var GameBoard = {
 
         // 行のセルを追加（左から右へ順番）
         rows.forEach(row => {
-            for (let col = 0; col < this.BOARD_SIZE; col++) {
+            for (let col = 0; col < CONFIG.BOARD_SIZE; col++) {
                 cellsToAnimate.push({
                     row: row,
                     col: col,
@@ -138,7 +143,7 @@ var GameBoard = {
 
         // 列のセルを追加（上から下へ順番）
         cols.forEach(col => {
-            for (let row = 0; row < this.BOARD_SIZE; row++) {
+            for (let row = 0; row < CONFIG.BOARD_SIZE; row++) {
                 const key = `${row}-${col}`;
                 // 行ですでに含まれている場合はスキップ
                 if (!cellsToAnimate.find(cell => cell.key === key)) {
