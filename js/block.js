@@ -61,7 +61,8 @@ var BlockManager = {
 
         this.currentBlocks.forEach(block => {
             if (!block.placed) {
-                this.renderBlock(container, block);
+                const blockElement = this.createBlockElement(block);
+                container.appendChild(blockElement);
             }
         });
     },
@@ -99,25 +100,16 @@ var BlockManager = {
             }
         }
 
-        // イベントハンドラの設定
-        this.attachBlockEvents(blockDiv, block);
-
-        // コンテナに追加
-        container.appendChild(blockDiv);
-    },
-
-    // ブロックにイベントを設定
-    attachBlockEvents: function(blockElement, block) {
         // マウスイベント
-        blockElement.addEventListener('mousedown', (e) => {
-            InputHandler.startDrag(e, block);
-        });
+        blockDiv.addEventListener('mousedown', (e) => InputHandler.startDrag(e, block));
 
         // タッチイベント
-        blockElement.addEventListener('touchstart', (e) => {
+        blockDiv.addEventListener('touchstart', (e) => {
             e.preventDefault();
             InputHandler.startDrag(e.touches[0], block);
         });
+
+        return blockDiv;
     },
 
     // ブロックが配置可能かチェック
