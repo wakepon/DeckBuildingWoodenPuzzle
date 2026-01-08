@@ -15,11 +15,15 @@ function restartGame() {
     // スコアリセット
     GameUI.resetScore();
 
+    // ゴールドリセット
+    GameUI.resetGold();
+
     // UIリセット
     GameUI.hideGameOver();
 
-    // ラウンドをリセット
+    // ラウンドと税金をリセット
     BlockManager.gameState.round = 1;
+    BlockManager.gameState.taxRate = 1;
 
     // 新しいブロックを生成
     BlockManager.init();
