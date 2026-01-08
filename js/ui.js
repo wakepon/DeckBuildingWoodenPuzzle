@@ -93,8 +93,8 @@ var GameUI = {
                     BlockManager.gameState.gold -= taxAmount;
                     this.updateGold(0); // 表示更新
 
-                    // 次のラウンドの税金を計算（2n-1: 1, 3, 5, 7, 9...）
-                    BlockManager.gameState.taxRate += 2;
+                    // 次のラウンドの税金を計算（1, 2, 3, 4, 5...）
+                    BlockManager.gameState.taxRate += 1;
 
                     // UI リセット
                     deckInfoElement.style.background = '';
