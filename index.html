@@ -31,7 +31,7 @@
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
         }
 
-        #score-display, #highscore-display {
+        #score-display, #highscore-display, #gold-display {
             background: linear-gradient(135deg, #6d4c41 0%, #5d4037 100%);
             color: #fff;
             font-size: 24px;
@@ -43,7 +43,7 @@
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
         }
 
-        #highscore-display {
+        #highscore-display, #gold-display {
             font-size: 18px;
             background: linear-gradient(135deg, #8d6e63 0%, #795548 100%);
         }
@@ -326,6 +326,7 @@
     <h1>Woody Puzzle</h1>
     <div id="score-display">スコア: 0</div>
     <div id="highscore-display">ハイスコア: 0</div>
+    <div id="gold-display">💰 ゴールド: 0</div>
     <div id="deck-info">ラウンド 1 - 残りブロック: 9/9</div>
 
     <div id="game-container">
@@ -336,8 +337,10 @@
     <div id="game-over-screen" style="display: none;">
         <div id="game-over-content">
             <h2>ゲームオーバー</h2>
+            <div id="game-over-reason"></div>
             <div id="final-score"></div>
             <div id="final-highscore"></div>
+            <div id="final-round"></div>
             <button id="restart-button">もう一度遊ぶ</button>
         </div>
     </div>

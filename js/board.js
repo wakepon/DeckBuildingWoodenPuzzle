@@ -195,6 +195,11 @@ var GameBoard = {
             }
 
             GameUI.updateScore(points);
+
+            // ゴールド獲得（消えたライン数だけゴールドを獲得）
+            if (totalLines > 0) {
+                GameUI.updateGold(totalLines);
+            }
         }, totalAnimationTime);
     }
 };
