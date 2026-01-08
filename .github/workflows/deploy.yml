@@ -1,0 +1,44 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Generate version from latest commit
+        id: version
+        run: |
+          # 最新コミットの日時を取得（UTC）
+          COMMIT_DATE_UTC=$(git log -1 --format=%cd --date=format-local:'%Y-%m-%d %H:%M:%S')
+
+          # UTC時刻をJSTに変換してバージョン番号を生成
+          # JST = UTC + 9時間
+          VERSION=$(TZ='Asia/Tokyo' git log -1 --format=%cd --date=format-local:'v%Y.%m.%d.%H%M')
+
+          echo "VERSION=$VERSION"
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Replace version placeholder
+        run: |
+          sed -i "s/__VERSION__/${{ steps.version.outputs.VERSION }}/g" js/config.js
+
+          # 確認用にconfig.jsの内容を表示
+          echo "Updated config.js:"
+          cat js/config.js
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./
+          publish_branch: gh-pages

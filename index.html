@@ -329,46 +329,23 @@
     </div>
 
     <!-- JavaScriptファイルの読み込み順序
-         1. ui.js      - UI管理（スコア、ハイスコア、ゲームオーバー画面）
-         2. board.js   - ボード管理（10x10グリッド、配置チェック、ライン消去）
-         3. block.js   - ブロック管理（生成、レンダリング、配置）
-         4. input.js   - 入力処理（ドラッグ&ドロップ）
-         5. main.js    - メイン処理（初期化、ゲームループ）
-
-         data-version属性: 各ファイルの最終更新日時（Unixタイムスタンプ）
+         1. config.js  - 設定（バージョン番号など）
+         2. ui.js      - UI管理（スコア、ハイスコア、ゲームオーバー画面）
+         3. board.js   - ボード管理（10x10グリッド、配置チェック、ライン消去）
+         4. block.js   - ブロック管理（生成、レンダリング、配置）
+         5. input.js   - 入力処理（ドラッグ&ドロップ）
+         6. main.js    - メイン処理（初期化、ゲームループ）
     -->
-    <script src="js/ui.js" data-version="1767792003"></script>
-    <script src="js/board.js" data-version="1767792003"></script>
-    <script src="js/block.js" data-version="1767792003"></script>
-    <script src="js/input.js" data-version="1767792003"></script>
-    <script src="js/main.js" data-version="1767792003"></script>
+    <script src="js/config.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/board.js"></script>
+    <script src="js/block.js"></script>
+    <script src="js/input.js"></script>
+    <script src="js/main.js"></script>
     <script>
-        // バージョン情報を日本時間で表示（最も新しいJSファイルの更新日時を使用）
+        // バージョン番号を表示
         (function() {
-            // すべてのscriptタグからdata-version属性を取得
-            const scripts = document.querySelectorAll('script[data-version]');
-            let maxTimestamp = 0;
-
-            scripts.forEach(script => {
-                const timestamp = parseInt(script.getAttribute('data-version'), 10);
-                if (timestamp > maxTimestamp) {
-                    maxTimestamp = timestamp;
-                }
-            });
-
-            // Unixタイムスタンプから日本時間に変換
-            const date = new Date(maxTimestamp * 1000);
-            const jstOffset = 9 * 60; // JST is UTC+9
-            const jstDate = new Date(date.getTime() + (jstOffset + date.getTimezoneOffset()) * 60000);
-
-            const year = jstDate.getFullYear();
-            const month = String(jstDate.getMonth() + 1).padStart(2, '0');
-            const day = String(jstDate.getDate()).padStart(2, '0');
-            const hours = String(jstDate.getHours()).padStart(2, '0');
-            const minutes = String(jstDate.getMinutes()).padStart(2, '0');
-
-            document.getElementById('version-display').textContent =
-                `Version: ${year}-${month}-${day} ${hours}:${minutes} JST`;
+            document.getElementById('version-display').textContent = CONFIG.VERSION;
         })();
     </script>
 </body>
