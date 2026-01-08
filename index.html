@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Woody Puzzle</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #d4a373 0%, #c19a6b 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            padding: 10px 10px 20px;
+            touch-action: none;
+        }
+
+        h1 {
+            color: #3e2723;
+            font-size: 28px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        #score-display, #highscore-display {
+            background: linear-gradient(135deg, #6d4c41 0%, #5d4037 100%);
+            color: #fff;
+            font-size: 24px;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        #highscore-display {
+            font-size: 18px;
+            background: linear-gradient(135deg, #8d6e63 0%, #795548 100%);
+        }
+
+        #version-display {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(62, 39, 35, 0.7);
+            color: #fff;
+            font-size: 12px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            font-family: monospace;
+        }
+
+        #game-over-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        #game-over-content {
+            background: linear-gradient(135deg, #8d6e63 0%, #795548 100%);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            color: #fff;
+        }
+
+        #game-over-content h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        #game-over-content div {
+            font-size: 24px;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+
+        #restart-button {
+            background: linear-gradient(135deg, #6d4c41 0%, #5d4037 100%);
+            color: #fff;
+            border: none;
+            padding: 15px 30px;
+            font-size: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        #restart-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        #restart-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        #game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        #board {
+            background: linear-gradient(135deg, #8d6e63 0%, #795548 100%);
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 2px;
+            width: 100%;
+            max-width: 400px;
+            aspect-ratio: 1;
+        }
+
+        .cell {
+            background: linear-gradient(135deg, #deb887 0%, #d2b48c 100%);
+            border: 1px solid #8d6e63;
+            border-radius: 2px;
+            aspect-ratio: 1;
+            transition: background 0.2s;
+        }
+
+        .cell.filled {
+            background: linear-gradient(135deg, #6d4c41 0%, #5d4037 100%);
+            border-color: #3e2723;
+        }
+
+        .cell.highlight {
+            background: linear-gradient(135deg, #aed581 0%, #9ccc65 100%);
+        }
+
+        .cell.invalid {
+            background: linear-gradient(135deg, #ef5350 0%, #e53935 100%);
+        }
+
+        .cell.clearing {
+            animation: fadeOut 0.5s ease-out forwards;
+        }
+
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(1.1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+        }
+
+        #blocks-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 20px;
+            background: rgba(141, 110, 99, 0.3);
+            border-radius: 10px;
+            width: 100%;
+            max-width: 400px;
+            min-height: 120px;
+            flex-wrap: wrap;
+        }
+
+        .block {
+            display: grid;
+            gap: 2px;
+            cursor: grab;
+            padding: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            transition: transform 0.2s;
+        }
+
+        .block:hover {
+            transform: scale(1.05);
+        }
+
+        .block.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+
+        .block-cell {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, #8d6e63 0%, #795548 100%);
+            border: 2px solid #6d4c41;
+            border-radius: 3px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .drag-preview {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0.8;
+            display: grid;
+            gap: 2px;
+        }
+
+        .drag-preview .block-cell {
+            width: 30px;
+            height: 30px;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 5px 10px 15px;
+            }
+
+            h1 {
+                font-size: 22px;
+                margin-bottom: 8px;
+            }
+
+            #game-container {
+                gap: 15px;
+            }
+
+            #board {
+                max-width: 350px;
+            }
+
+            .block-cell {
+                width: 25px;
+                height: 25px;
+            }
+
+            .drag-preview .block-cell {
+                width: 25px;
+                height: 25px;
+            }
+
+            #blocks-container {
+                max-width: 350px;
+                gap: 10px;
+                padding: 15px;
+                min-height: 100px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            body {
+                padding: 5px 8px 10px;
+            }
+
+            h1 {
+                font-size: 20px;
+                margin-bottom: 5px;
+            }
+
+            #game-container {
+                gap: 12px;
+            }
+
+            #board {
+                max-width: 300px;
+            }
+
+            .block-cell {
+                width: 22px;
+                height: 22px;
+            }
+
+            .drag-preview .block-cell {
+                width: 22px;
+                height: 22px;
+            }
+
+            #blocks-container {
+                max-width: 300px;
+                padding: 12px;
+                min-height: 90px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="version-display"></div>
+    <h1>Woody Puzzle</h1>
+    <div id="score-display">スコア: 0</div>
+    <div id="highscore-display">ハイスコア: 0</div>
+
+    <div id="game-container">
+        <div id="board"></div>
+        <div id="blocks-container"></div>
+    </div>
+
+    <div id="game-over-screen" style="display: none;">
+        <div id="game-over-content">
+            <h2>ゲームオーバー</h2>
+            <div id="final-score"></div>
+            <div id="final-highscore"></div>
+            <button id="restart-button">もう一度遊ぶ</button>
+        </div>
+    </div>
+
+    <!-- JavaScriptファイルの読み込み順序
+         1. config.js  - 設定（バージョン番号など）
+         2. ui.js      - UI管理（スコア、ハイスコア、ゲームオーバー画面）
+         3. board.js   - ボード管理（10x10グリッド、配置チェック、ライン消去）
+         4. block.js   - ブロック管理（生成、レンダリング、配置）
+         5. input.js   - 入力処理（ドラッグ&ドロップ）
+         6. main.js    - メイン処理（初期化、ゲームループ）
+    -->
+    <script src="js/config.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/board.js"></script>
+    <script src="js/block.js"></script>
+    <script src="js/input.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        // バージョン番号を表示
+        (function() {
+            document.getElementById('version-display').textContent = CONFIG.VERSION;
+        })();
+    </script>
+</body>
+</html>
