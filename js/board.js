@@ -121,39 +121,59 @@ var GameBoard = {
 
     // 行・列をクリア
     clearLines: function(rows, cols) {
-        // アニメーション用のセルを収集
-        const cellsToClear = new Set();
+        // アニメーション用のセル配列（順序付き）
+        const cellsToAnimate = [];
 
+        // 行のセルを追加（左から右へ順番）
         rows.forEach(row => {
             for (let col = 0; col < this.BOARD_SIZE; col++) {
-                cellsToClear.add(`${row}-${col}`);
+                cellsToAnimate.push({
+                    row: row,
+                    col: col,
+                    delay: col * CONFIG.ANIMATION.DELAY_PER_BLOCK,
+                    key: `${row}-${col}`
+                });
             }
         });
 
+        // 列のセルを追加（上から下へ順番）
         cols.forEach(col => {
             for (let row = 0; row < this.BOARD_SIZE; row++) {
-                cellsToClear.add(`${row}-${col}`);
+                const key = `${row}-${col}`;
+                // 行ですでに含まれている場合はスキップ
+                if (!cellsToAnimate.find(cell => cell.key === key)) {
+                    cellsToAnimate.push({
+                        row: row,
+                        col: col,
+                        delay: row * CONFIG.ANIMATION.DELAY_PER_BLOCK,
+                        key: key
+                    });
+                }
             }
         });
 
-        // アニメーション開始
-        cellsToClear.forEach(key => {
-            const [row, col] = key.split('-').map(Number);
-            const cellElement = document.querySelector(
-                `[data-row="${row}"][data-col="${col}"]`
-            );
-            if (cellElement) {
-                cellElement.classList.add('clearing');
-            }
-        });
-
-        // アニメーション終了後にクリア
-        setTimeout(() => {
-            cellsToClear.forEach(key => {
-                const [row, col] = key.split('-').map(Number);
-                this.board[row][col] = false;
+        // 各セルにアニメーションを適用
+        cellsToAnimate.forEach(cellData => {
+            setTimeout(() => {
                 const cellElement = document.querySelector(
-                    `[data-row="${row}"][data-col="${col}"]`
+                    `[data-row="${cellData.row}"][data-col="${cellData.col}"]`
+                );
+                if (cellElement) {
+                    cellElement.classList.add('clearing');
+                }
+            }, cellData.delay);
+        });
+
+        // 最大遅延 + アニメーション時間後にクリア処理
+        const maxDelay = Math.max(...cellsToAnimate.map(c => c.delay), 0);
+        const totalAnimationTime = maxDelay + CONFIG.ANIMATION.DURATION;
+
+        setTimeout(() => {
+            // ボードとDOM要素をクリア
+            cellsToAnimate.forEach(cellData => {
+                this.board[cellData.row][cellData.col] = false;
+                const cellElement = document.querySelector(
+                    `[data-row="${cellData.row}"][data-col="${cellData.col}"]`
                 );
                 if (cellElement) {
                     cellElement.classList.remove('filled', 'clearing');
@@ -175,6 +195,6 @@ var GameBoard = {
             }
 
             GameUI.updateScore(points);
-        }, 500);
+        }, totalAnimationTime);
     }
 };
