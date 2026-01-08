@@ -45,5 +45,32 @@ var GameUI = {
     // ゲームオーバー画面を非表示
     hideGameOver: function() {
         document.getElementById('game-over-screen').style.display = 'none';
+    },
+
+    // デッキ情報を更新
+    updateDeckInfo: function(remainingBlocks, round) {
+        const deckInfoElement = document.getElementById('deck-info');
+        if (deckInfoElement) {
+            deckInfoElement.textContent = `ラウンド ${round} - 残りブロック: ${remainingBlocks}/9`;
+        }
+    },
+
+    // ラウンド終了メッセージを表示
+    showRoundEnd: function(round) {
+        const deckInfoElement = document.getElementById('deck-info');
+        if (deckInfoElement) {
+            deckInfoElement.textContent = `ラウンド ${round} 終了！`;
+            deckInfoElement.style.backgroundColor = '#4caf50';
+            deckInfoElement.style.color = '#fff';
+            deckInfoElement.style.fontWeight = 'bold';
+
+            // 3秒後に次のラウンドを開始
+            setTimeout(() => {
+                deckInfoElement.style.backgroundColor = '';
+                deckInfoElement.style.color = '';
+                deckInfoElement.style.fontWeight = '';
+                BlockManager.startNextRound();
+            }, 3000);
+        }
     }
 };
