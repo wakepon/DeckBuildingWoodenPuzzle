@@ -76,7 +76,6 @@ var GameUI = {
         const deckInfoElement = document.getElementById('deck-info');
         if (deckInfoElement) {
             const taxAmount = BlockManager.gameState.taxRate;
-            const currentGold = BlockManager.gameState.gold;
 
             // 税金表示
             deckInfoElement.textContent = `ラウンド ${round} 終了！ 税金: ${taxAmount}ゴールド`;
@@ -86,6 +85,9 @@ var GameUI = {
 
             // 3秒後に税金支払い処理
             setTimeout(() => {
+                // 税金判定時に最新のゴールド額を取得（ライン消去で獲得したゴールドを含む）
+                const currentGold = BlockManager.gameState.gold;
+
                 if (currentGold >= taxAmount) {
                     // 税金支払い可能
                     BlockManager.gameState.gold -= taxAmount;
