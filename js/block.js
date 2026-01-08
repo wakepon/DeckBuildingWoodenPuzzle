@@ -4,6 +4,7 @@
 var BlockManager = {
     // ゲームステート
     gameState: {
+        initialDeck: [],    // 最初に決めた9種類のブロック（ラウンド間で共有）
         deck: [],           // 残りのデッキ
         currentBlocks: [],  // 現在の手札（3つ）
         round: 1            // 現在のラウンド
@@ -225,9 +226,10 @@ var BlockManager = {
 
     // ブロックの初期化
     init: function() {
-        // 新しいデッキを作成してシャッフル
-        const newDeck = this.createDeck();
-        this.gameState.deck = this.shuffleDeck(newDeck);
+        // 新しいデッキを作成して初期デッキとして保存
+        this.gameState.initialDeck = this.createDeck();
+        // 初期デッキのコピーをシャッフルして使用
+        this.gameState.deck = this.shuffleDeck([...this.gameState.initialDeck]);
 
         // 最初の3つを引く
         this.gameState.currentBlocks = this.drawBlocks();
@@ -362,8 +364,8 @@ var BlockManager = {
     // 次のラウンドを開始
     startNextRound: function() {
         this.gameState.round++;
-        const newDeck = this.createDeck();
-        this.gameState.deck = this.shuffleDeck(newDeck);
+        // 初期デッキのコピーをシャッフルして再利用（新しいデッキは作成しない）
+        this.gameState.deck = this.shuffleDeck([...this.gameState.initialDeck]);
         this.gameState.currentBlocks = this.drawBlocks();
         this.render();
         GameUI.updateDeckInfo(this.gameState.deck.length + this.gameState.currentBlocks.length, this.gameState.round);
