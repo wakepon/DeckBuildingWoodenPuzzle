@@ -2,8 +2,7 @@
 
 // UI管理オブジェクト
 var GameUI = {
-    score: 0,
-    highScore: 0,
+    highScore: 1,
     gameOverReason: '', // ゲームオーバーの理由
 
     // ハイスコアの読み込み
@@ -11,29 +10,18 @@ var GameUI = {
         const saved = localStorage.getItem('woodyPuzzleHighScore');
         if (saved) {
             this.highScore = parseInt(saved, 10);
-            document.getElementById('highscore-display').textContent = `ハイスコア: ${this.highScore}`;
+            document.getElementById('highscore-display').textContent = `最高ラウンド: ${this.highScore}`;
         }
     },
 
     // ハイスコアの保存
     saveHighScore: function() {
-        if (this.score > this.highScore) {
-            this.highScore = this.score;
+        const currentRound = BlockManager.gameState.round;
+        if (currentRound > this.highScore) {
+            this.highScore = currentRound;
             localStorage.setItem('woodyPuzzleHighScore', this.highScore.toString());
-            document.getElementById('highscore-display').textContent = `ハイスコア: ${this.highScore}`;
+            document.getElementById('highscore-display').textContent = `最高ラウンド: ${this.highScore}`;
         }
-    },
-
-    // スコア更新
-    updateScore: function(points) {
-        this.score += points;
-        document.getElementById('score-display').textContent = `スコア: ${this.score}`;
-    },
-
-    // スコアリセット
-    resetScore: function() {
-        this.score = 0;
-        this.updateScore(0);
     },
 
     // ゴールド更新
@@ -52,9 +40,8 @@ var GameUI = {
     showGameOver: function(reason) {
         this.gameOverReason = reason || 'ブロックを配置できません';
         document.getElementById('game-over-reason').textContent = this.gameOverReason;
-        document.getElementById('final-score').textContent = `スコア: ${this.score}`;
-        document.getElementById('final-highscore').textContent = `ハイスコア: ${this.highScore}`;
-        document.getElementById('final-round').textContent = `最終ラウンド: ${BlockManager.gameState.round}`;
+        document.getElementById('final-round').textContent = `到達ラウンド: ${BlockManager.gameState.round}`;
+        document.getElementById('final-highscore').textContent = `最高ラウンド: ${this.highScore}`;
         document.getElementById('game-over-screen').style.display = 'flex';
     },
 

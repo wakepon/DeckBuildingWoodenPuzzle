@@ -12,9 +12,6 @@ function restartGame() {
     // ボードをクリア
     GameBoard.clear();
 
-    // スコアリセット
-    GameUI.resetScore();
-
     // ゴールドリセット
     GameUI.resetGold();
 
