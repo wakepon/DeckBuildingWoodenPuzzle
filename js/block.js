@@ -328,10 +328,7 @@ var BlockManager = {
 
     // ブロックを配置
     placeBlock: function(row, col, block) {
-        const cellCount = GameBoard.place(row, col, block.shape);
-
-        // 配置スコア（マス数 × 10点）
-        GameUI.updateScore(cellCount * 10);
+        GameBoard.place(row, col, block.shape);
 
         block.placed = true;
         this.render();
