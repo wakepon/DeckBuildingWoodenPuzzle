@@ -369,5 +369,14 @@ var BlockManager = {
         this.render();
         GameUI.updateDeckInfo(this.gameState.deck.length + this.gameState.currentBlocks.length, this.gameState.round);
         this.checkGameOver();
+    },
+
+    // ショップで選択されたブロックをデッキに追加
+    addBlockToDeck: function(shape) {
+        // 初期デッキに追加
+        this.gameState.initialDeck.push(shape);
+        // デッキ情報を更新（UI表示用）
+        const totalDeckSize = this.gameState.initialDeck.length;
+        GameUI.updateDeckInfo(this.gameState.deck.length + this.gameState.currentBlocks.length, this.gameState.round);
     }
 };
