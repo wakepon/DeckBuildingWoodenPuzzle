@@ -180,23 +180,8 @@ var GameBoard = {
                 }
             });
 
-            // スコア計算
-            const totalLines = rows.length + cols.length;
-            let points = 0;
-
-            if (totalLines === 1) {
-                points = 100;
-            } else if (totalLines === 2) {
-                points = 300;
-            } else if (totalLines === 3) {
-                points = 500;
-            } else if (totalLines >= 4) {
-                points = 500 + (totalLines - 3) * 200;
-            }
-
-            GameUI.updateScore(points);
-
             // ゴールド獲得（消えたライン数だけゴールドを獲得）
+            const totalLines = rows.length + cols.length;
             if (totalLines > 0) {
                 GameUI.updateGold(totalLines);
             }
