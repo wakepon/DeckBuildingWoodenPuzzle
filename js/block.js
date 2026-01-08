@@ -339,6 +339,10 @@ var BlockManager = {
         // 3つすべて配置したかチェック
         const allPlaced = this.gameState.currentBlocks.every(b => b.placed);
         if (allPlaced) {
+            // ライン消去アニメーションの最大時間を計算
+            // 最大10マス × 50ms遅延 + 300ms アニメーション時間 = 800ms
+            const maxAnimationTime = (GameBoard.BOARD_SIZE * CONFIG.ANIMATION.DELAY_PER_BLOCK) + CONFIG.ANIMATION.DURATION;
+
             setTimeout(() => {
                 // デッキに残りがあれば次の3つを引く
                 if (this.gameState.deck.length > 0) {
@@ -348,9 +352,10 @@ var BlockManager = {
                     this.checkGameOver();
                 } else {
                     // デッキが空ならラウンド終了
+                    // ゴールド獲得処理が完全に終わってから表示
                     GameUI.showRoundEnd(this.gameState.round);
                 }
-            }, 600); // クリアアニメーション後に生成
+            }, maxAnimationTime + 50); // アニメーション完了後に確実にゴールドが反映されるよう余裕を持たせる
         } else {
             // まだ配置していないブロックがある場合
             // UI更新（配置済みブロックを除く）
