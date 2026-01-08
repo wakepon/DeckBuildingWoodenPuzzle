@@ -54,7 +54,8 @@ var GameUI = {
     updateDeckInfo: function(remainingBlocks, round) {
         const deckInfoElement = document.getElementById('deck-info');
         if (deckInfoElement) {
-            deckInfoElement.textContent = `ラウンド ${round} - 残りブロック: ${remainingBlocks}/9`;
+            const totalDeckSize = BlockManager.gameState.initialDeck.length;
+            deckInfoElement.textContent = `ラウンド ${round} - 残りブロック: ${remainingBlocks}/${totalDeckSize}`;
         }
     },
 
@@ -88,8 +89,8 @@ var GameUI = {
                     deckInfoElement.style.color = '';
                     deckInfoElement.style.fontWeight = '';
 
-                    // 次のラウンド開始
-                    BlockManager.startNextRound();
+                    // ショップを表示
+                    Shop.show();
                 } else {
                     // 税金支払い不可 → ゲームオーバー
                     this.saveHighScore();
