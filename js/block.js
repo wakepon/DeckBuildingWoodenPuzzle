@@ -2,6 +2,13 @@
 
 // ブロック管理オブジェクト
 var BlockManager = {
+    // ゲームステート
+    gameState: {
+        deck: [],           // 残りのデッキ
+        currentBlocks: [],  // 現在の手札（3つ）
+        round: 1            // 現在のラウンド
+    },
+
     // ブロックの定義（形状）- 3x3以内の全パターン（回転も別パターンとして扱う）
     blockShapes: [
         // ===== 1マス（モノミノ）: 1種類 =====
@@ -176,26 +183,59 @@ var BlockManager = {
         [[1, 1, 1], [1, 1, 1], [1, 1, 1]]
     ],
 
-    currentBlocks: [],
+    // デッキを作成（9種類のブロックをランダムに選択）
+    createDeck: function() {
+        const deck = [];
+        const shapes = CONFIG.DECK_BLOCK_SHAPES;
 
-    // ランダムなブロックを選択
-    getRandomBlocks: function(count) {
+        for (let i = 0; i < 9; i++) {
+            const randomIndex = Math.floor(Math.random() * shapes.length);
+            deck.push(shapes[randomIndex]);
+        }
+
+        return deck;
+    },
+
+    // デッキをシャッフル
+    shuffleDeck: function(deck) {
+        const shuffled = [...deck];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+    },
+
+    // デッキから3つのブロックを引く
+    drawBlocks: function() {
         const blocks = [];
-        for (let i = 0; i < count; i++) {
-            const randomIndex = Math.floor(Math.random() * this.blockShapes.length);
+        const drawCount = Math.min(3, this.gameState.deck.length);
+
+        for (let i = 0; i < drawCount; i++) {
+            const shape = this.gameState.deck.shift();
             blocks.push({
                 id: Date.now() + i,
-                shape: this.blockShapes[randomIndex],
+                shape: shape,
                 placed: false
             });
         }
+
         return blocks;
     },
 
     // ブロックの初期化
     init: function() {
-        this.currentBlocks = this.getRandomBlocks(3);
+        // 新しいデッキを作成してシャッフル
+        const newDeck = this.createDeck();
+        this.gameState.deck = this.shuffleDeck(newDeck);
+
+        // 最初の3つを引く
+        this.gameState.currentBlocks = this.drawBlocks();
         this.render();
+
+        // UI更新
+        GameUI.updateDeckInfo(this.gameState.deck.length + this.gameState.currentBlocks.length, this.gameState.round);
+
         this.checkGameOver();
     },
 
@@ -204,7 +244,7 @@ var BlockManager = {
         const container = document.getElementById('blocks-container');
         container.innerHTML = '';
 
-        this.currentBlocks.forEach(block => {
+        this.gameState.currentBlocks.forEach(block => {
             if (!block.placed) {
                 const blockElement = this.createBlockElement(block);
                 container.appendChild(blockElement);
@@ -259,7 +299,7 @@ var BlockManager = {
 
     // ブロックが配置可能かチェック
     canPlaceAnyBlock: function() {
-        for (const block of this.currentBlocks) {
+        for (const block of this.gameState.currentBlocks) {
             if (block.placed) continue;
 
             // ボード上のすべての位置を試す
@@ -295,17 +335,38 @@ var BlockManager = {
         // 行・列のクリアチェック
         GameBoard.checkAndClearLines();
 
-        // 3つすべて配置したら新しいブロックを生成
-        const allPlaced = this.currentBlocks.every(b => b.placed);
+        // 3つすべて配置したかチェック
+        const allPlaced = this.gameState.currentBlocks.every(b => b.placed);
         if (allPlaced) {
             setTimeout(() => {
-                this.currentBlocks = this.getRandomBlocks(3);
-                this.render();
-                this.checkGameOver();
+                // デッキに残りがあれば次の3つを引く
+                if (this.gameState.deck.length > 0) {
+                    this.gameState.currentBlocks = this.drawBlocks();
+                    this.render();
+                    GameUI.updateDeckInfo(this.gameState.deck.length + this.gameState.currentBlocks.length, this.gameState.round);
+                    this.checkGameOver();
+                } else {
+                    // デッキが空ならラウンド終了
+                    GameUI.showRoundEnd(this.gameState.round);
+                }
             }, 600); // クリアアニメーション後に生成
         } else {
-            // まだ配置していないブロックがある場合もゲームオーバーチェック
+            // まだ配置していないブロックがある場合
+            // UI更新（配置済みブロックを除く）
+            const remainingInHand = this.gameState.currentBlocks.filter(b => !b.placed).length;
+            GameUI.updateDeckInfo(this.gameState.deck.length + remainingInHand, this.gameState.round);
             this.checkGameOver();
         }
+    },
+
+    // 次のラウンドを開始
+    startNextRound: function() {
+        this.gameState.round++;
+        const newDeck = this.createDeck();
+        this.gameState.deck = this.shuffleDeck(newDeck);
+        this.gameState.currentBlocks = this.drawBlocks();
+        this.render();
+        GameUI.updateDeckInfo(this.gameState.deck.length + this.gameState.currentBlocks.length, this.gameState.round);
+        this.checkGameOver();
     }
 };
