@@ -358,10 +358,17 @@ var BlockManager = {
             }, maxAnimationTime + 50); // アニメーション完了後に確実にゴールドが反映されるよう余裕を持たせる
         } else {
             // まだ配置していないブロックがある場合
+            // ライン消去アニメーションの最大時間を計算
+            const maxAnimationTime = (CONFIG.BOARD_SIZE * CONFIG.ANIMATION.DELAY_PER_BLOCK) + CONFIG.ANIMATION.DURATION;
+
             // UI更新（配置済みブロックを除く）
             const remainingInHand = this.gameState.currentBlocks.filter(b => !b.placed).length;
             GameUI.updateDeckInfo(this.gameState.deck.length + remainingInHand, this.gameState.round);
-            this.checkGameOver();
+
+            // ライン消去アニメーション完了後にゲームオーバーチェック
+            setTimeout(() => {
+                this.checkGameOver();
+            }, maxAnimationTime + 50);
         }
     },
 
