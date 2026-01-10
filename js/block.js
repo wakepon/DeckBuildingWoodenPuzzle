@@ -307,8 +307,8 @@ var BlockManager = {
             if (block.placed) continue;
 
             // ボード上のすべての位置を試す
-            for (let row = 0; row < GameBoard.BOARD_SIZE; row++) {
-                for (let col = 0; col < GameBoard.BOARD_SIZE; col++) {
+            for (let row = 0; row < CONFIG.BOARD_SIZE; row++) {
+                for (let col = 0; col < CONFIG.BOARD_SIZE; col++) {
                     if (GameBoard.canPlace(row, col, block.shape)) {
                         return true;
                     }
@@ -341,7 +341,7 @@ var BlockManager = {
         if (allPlaced) {
             // ライン消去アニメーションの最大時間を計算
             // 最大10マス × 50ms遅延 + 300ms アニメーション時間 = 800ms
-            const maxAnimationTime = (GameBoard.BOARD_SIZE * CONFIG.ANIMATION.DELAY_PER_BLOCK) + CONFIG.ANIMATION.DURATION;
+            const maxAnimationTime = (CONFIG.BOARD_SIZE * CONFIG.ANIMATION.DELAY_PER_BLOCK) + CONFIG.ANIMATION.DURATION;
 
             setTimeout(() => {
                 // デッキに残りがあれば次の3つを引く

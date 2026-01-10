@@ -78,13 +78,13 @@ var InputHandler = {
         });
 
         const boardRect = document.getElementById('board').getBoundingClientRect();
-        const cellSize = boardRect.width / GameBoard.BOARD_SIZE;
+        const cellSize = boardRect.width / CONFIG.BOARD_SIZE;
 
         // ボード上の位置を計算
         const col = Math.floor((x - boardRect.left) / cellSize);
         const row = Math.floor((y - boardRect.top) / cellSize);
 
-        if (col < 0 || col >= GameBoard.BOARD_SIZE || row < 0 || row >= GameBoard.BOARD_SIZE) return;
+        if (col < 0 || col >= CONFIG.BOARD_SIZE || row < 0 || row >= CONFIG.BOARD_SIZE) return;
 
         // ブロックが配置可能かチェック
         const canPlace = GameBoard.canPlace(row, col, this.draggedBlock.shape);
@@ -96,8 +96,8 @@ var InputHandler = {
                 if (cell) {
                     const targetRow = row + r;
                     const targetCol = col + c;
-                    if (targetRow >= 0 && targetRow < GameBoard.BOARD_SIZE &&
-                        targetCol >= 0 && targetCol < GameBoard.BOARD_SIZE) {
+                    if (targetRow >= 0 && targetRow < CONFIG.BOARD_SIZE &&
+                        targetCol >= 0 && targetCol < CONFIG.BOARD_SIZE) {
                         const cellElement = document.querySelector(
                             `[data-row="${targetRow}"][data-col="${targetCol}"]`
                         );
@@ -118,7 +118,7 @@ var InputHandler = {
         const y = e.clientY || (e.changedTouches && e.changedTouches[0].clientY);
 
         const boardRect = document.getElementById('board').getBoundingClientRect();
-        const cellSize = boardRect.width / GameBoard.BOARD_SIZE;
+        const cellSize = boardRect.width / CONFIG.BOARD_SIZE;
 
         const col = Math.floor((x - boardRect.left) / cellSize);
         const row = Math.floor((y - boardRect.top) / cellSize);
