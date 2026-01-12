@@ -631,15 +631,21 @@
     </div>
 
     <!-- JavaScriptファイルの読み込み順序
-         1. config.js  - 設定（バージョン番号など）
-         2. ui.js      - UI管理（スコア、ハイスコア、ゲームオーバー画面）
-         3. shop.js    - ショップ管理（ブロック選択、デッキ追加）
-         4. board.js   - ボード管理（10x10グリッド、配置チェック、ライン消去）
-         5. block.js   - ブロック管理（生成、レンダリング、配置）
-         6. input.js   - 入力処理（ドラッグ&ドロップ）
-         7. main.js    - メイン処理（初期化、ゲームループ）
+         1. config.js         - 設定（定数、バージョン番号など）
+         2. shapes.js         - ブロック形状定義
+         3. block-renderer.js - ブロック要素作成（共通処理）
+         4. deck.js           - デッキ管理
+         5. ui.js             - UI管理（スコア、ハイスコア、ゲームオーバー画面）
+         6. shop.js           - ショップ管理（ブロック選択、デッキ追加）
+         7. board.js          - ボード管理（5x5グリッド、配置チェック、ライン消去）
+         8. block.js          - ブロック管理（ゲームロジック）
+         9. input.js          - 入力処理（ドラッグ&ドロップ）
+        10. main.js           - メイン処理（初期化、ゲームループ）
     -->
     <script src="js/config.js"></script>
+    <script src="js/shapes.js"></script>
+    <script src="js/block-renderer.js"></script>
+    <script src="js/deck.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/shop.js"></script>
     <script src="js/board.js"></script>

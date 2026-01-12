@@ -115,7 +115,7 @@ var GameUI = {
 
     // 目標スコア表示更新
     updateTargetScore: function(round) {
-        const targetScore = round * 20;
+        const targetScore = round * CONFIG.GAME.TARGET_SCORE_MULTIPLIER;
         document.getElementById('target-score-display').textContent = `目標スコア: ${targetScore}`;
     },
 
@@ -137,8 +137,8 @@ var GameUI = {
     updatePlacementInfo: function(blocksPlaced, round) {
         const deckInfoElement = document.getElementById('deck-info');
         if (deckInfoElement) {
-            const remaining = 12 - blocksPlaced;
-            deckInfoElement.textContent = `ラウンド ${round} - 残り配置数: ${remaining}/12`;
+            const remaining = CONFIG.GAME.MAX_PLACEMENTS_PER_ROUND - blocksPlaced;
+            deckInfoElement.textContent = `ラウンド ${round} - 残り配置数: ${remaining}/${CONFIG.GAME.MAX_PLACEMENTS_PER_ROUND}`;
         }
     },
 
@@ -146,7 +146,7 @@ var GameUI = {
     showRoundEnd: function(round) {
         const deckInfoElement = document.getElementById('deck-info');
         if (deckInfoElement) {
-            const targetScore = round * 20;
+            const targetScore = round * CONFIG.GAME.TARGET_SCORE_MULTIPLIER;
             const currentScore = BlockManager.gameState.score;
 
             // 目標スコア判定

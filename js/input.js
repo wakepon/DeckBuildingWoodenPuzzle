@@ -9,23 +9,12 @@ var InputHandler = {
     startDrag: function(e, block) {
         this.draggedBlock = block;
 
-        // ドラッグプレビューの作成
-        this.dragPreview = document.createElement('div');
-        this.dragPreview.className = 'drag-preview';
-        const rows = block.shape.length;
-        const cols = block.shape[0].length;
-        this.dragPreview.style.gridTemplateColumns = `repeat(${cols}, 30px)`;
-        this.dragPreview.style.gridTemplateRows = `repeat(${rows}, 30px)`;
-
-        block.shape.forEach(row => {
-            row.forEach(cell => {
-                const cellDiv = document.createElement('div');
-                cellDiv.className = 'block-cell';
-                if (!cell) {
-                    cellDiv.style.visibility = 'hidden';
-                }
-                this.dragPreview.appendChild(cellDiv);
-            });
+        // ドラッグプレビューの作成（BlockRendererを使用）
+        this.dragPreview = BlockRenderer.createBlockElement({
+            shape: block.shape,
+            cellSize: CONFIG.CELL_SIZE.DEFAULT,
+            className: 'drag-preview',
+            cellClassName: 'block-cell'
         });
 
         document.body.appendChild(this.dragPreview);
