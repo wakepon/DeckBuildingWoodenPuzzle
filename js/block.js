@@ -351,19 +351,13 @@ var BlockManager = {
         this.gameState.blocksPlacedCount++;
         this.render();
 
-        // 行・列のクリアチェック
-        GameBoard.checkAndClearLines();
-
-        // ライン消去アニメーションの最大時間を計算
-        const maxAnimationTime = (CONFIG.BOARD_SIZE * CONFIG.ANIMATION.DELAY_PER_BLOCK) + CONFIG.ANIMATION.DURATION;
-
         // UI更新
         GameUI.updatePlacementInfo(this.gameState.blocksPlacedCount, this.gameState.round);
 
-        // ライン消去アニメーション完了後にスコアチェック
-        const scoreAnimationTime = maxAnimationTime;
+        // 行・列のクリアチェック（スコアアニメーション完了後にコールバックが呼ばれる）
+        GameBoard.checkAndClearLines(() => {
+            // スコアアニメーション完了後に実行される処理
 
-        setTimeout(() => {
             // 目標スコアに達成したかチェック
             const targetScore = this.gameState.round * 20;
             if (this.gameState.score >= targetScore) {
@@ -390,7 +384,7 @@ var BlockManager = {
                 // ゲームオーバーチェック
                 this.checkGameOver();
             }
-        }, scoreAnimationTime);
+        });
     },
 
     // 次のラウンドを開始

@@ -91,7 +91,7 @@ var GameBoard = {
     },
 
     // 完成した行・列をチェック
-    checkAndClearLines: function() {
+    checkAndClearLines: function(onComplete) {
         const rowsToClear = [];
         const colsToClear = [];
 
@@ -118,14 +118,19 @@ var GameBoard = {
 
         // クリア処理
         if (rowsToClear.length > 0 || colsToClear.length > 0) {
-            this.clearLines(rowsToClear, colsToClear);
+            this.clearLines(rowsToClear, colsToClear, onComplete);
+        } else {
+            // ラインがクリアされなかった場合もコールバックを呼ぶ
+            if (onComplete) {
+                onComplete();
+            }
         }
 
         return rowsToClear.length + colsToClear.length;
     },
 
     // 行・列をクリア
-    clearLines: function(rows, cols) {
+    clearLines: function(rows, cols, onComplete) {
         // アニメーション用のセル配列（順序付き）
         const cellsToAnimate = [];
 
@@ -197,7 +202,13 @@ var GameBoard = {
             if (totalLines > 0 && totalBlocks > 0) {
                 const scoreAmount = totalBlocks * totalLines;
                 // スコア計算演出を表示（演出内でスコアがインクリメントされる）
-                GameUI.showScoreCalculation(totalBlocks, totalLines, scoreAmount);
+                // スコアアニメーション完了後にonCompleteコールバックを呼ぶ
+                GameUI.showScoreCalculation(totalBlocks, totalLines, scoreAmount, onComplete);
+            } else {
+                // ラインがクリアされなかった場合もコールバックを呼ぶ
+                if (onComplete) {
+                    onComplete();
+                }
             }
         }, totalAnimationTime);
     }
