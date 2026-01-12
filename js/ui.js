@@ -48,9 +48,13 @@ var GameUI = {
     },
 
     // スコア計算演出を表示
-    showScoreCalculation: function(totalBlocks, totalLines, scoreAmount) {
+    showScoreCalculation: function(totalBlocks, totalLines, scoreAmount, callback) {
         const display = document.getElementById('score-effect-display');
-        if (!display) return;
+        if (!display) {
+            // displayが存在しない場合でも、スコアは加算してコールバックを呼ぶ
+            this.animateScoreIncrement(scoreAmount, callback);
+            return;
+        }
 
         // 第1段階: ブロック数 × ライン数
         display.innerHTML = `${totalBlocks}<br>×<br>${totalLines}ライン`;
@@ -59,7 +63,7 @@ var GameUI = {
         // 1秒後に第2段階: 計算結果とスコアインクリメント
         setTimeout(() => {
             display.innerHTML = `${scoreAmount}`;
-            this.animateScoreIncrement(scoreAmount);
+            this.animateScoreIncrement(scoreAmount, callback);
         }, 1000);
 
         // さらに1秒後に非表示
@@ -69,7 +73,7 @@ var GameUI = {
     },
 
     // スコアのインクリメントアニメーション
-    animateScoreIncrement: function(targetAmount) {
+    animateScoreIncrement: function(targetAmount, callback) {
         const startScore = BlockManager.gameState.score;
         const endScore = startScore + targetAmount;
         const duration = 800; // 0.8秒
@@ -92,6 +96,11 @@ var GameUI = {
                 // 最終的な正確な値を設定
                 BlockManager.gameState.score = endScore;
                 document.getElementById('score-display').textContent = `スコア: ${endScore}`;
+
+                // コールバックが指定されている場合は実行
+                if (callback) {
+                    callback();
+                }
             }
         };
 
