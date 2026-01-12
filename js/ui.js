@@ -164,5 +164,32 @@ var GameUI = {
                 this.showGameOver(`目標スコアに到達できませんでした（目標: ${targetScore}、獲得: ${currentScore}）`);
             }
         }
+    },
+
+    // データリセット機能
+    resetData: function() {
+        if (confirm('データをリセットしますか？')) {
+            // localStorageをクリア
+            localStorage.clear();
+            // ページをリロード
+            window.location.reload();
+        }
+    },
+
+    // 設定アイコンのイベントリスナーを初期化
+    initSettingsIcon: function() {
+        const settingsIcon = document.getElementById('settings-icon');
+        if (settingsIcon) {
+            // クリックイベント（PC用）
+            settingsIcon.addEventListener('click', function() {
+                GameUI.resetData();
+            });
+
+            // タッチイベント（モバイル用）
+            settingsIcon.addEventListener('touchend', function(e) {
+                e.preventDefault(); // デフォルトのタッチ動作を防止
+                GameUI.resetData();
+            });
+        }
     }
 };

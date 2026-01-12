@@ -29,4 +29,5 @@ function restartGame() {
 document.addEventListener('DOMContentLoaded', function() {
     initGame();
     document.getElementById('restart-button').addEventListener('click', restartGame);
+    GameUI.initSettingsIcon();
 });
