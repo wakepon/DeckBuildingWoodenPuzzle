@@ -17,62 +17,67 @@ var Shop = {
         return size;
     },
 
-    // 小さいブロック（1-2マス）を生成
-    generateSmallBlock: function() {
-        // CONFIG.DECK_BLOCK_SHAPESから1-2マスのブロックを選択
-        const smallBlocks = [];
-        for (let i = 0; i < CONFIG.DECK_BLOCK_SHAPES.length; i++) {
-            const shape = CONFIG.DECK_BLOCK_SHAPES[i];
-            const size = this.getBlockSize(shape);
-            if (size <= 2) {
-                smallBlocks.push(shape);
-            }
-        }
-        const randomIndex = Math.floor(Math.random() * smallBlocks.length);
-        return smallBlocks[randomIndex];
-    },
-
-    // テトリミノ以上のブロック（4マス以上）を生成
-    generateLargeBlock: function() {
-        // BlockManager.blockShapesから4マス以上のブロックを選択
-        const largeBlocks = [];
+    // 1枠目: モノミノ（1マス）もしくはドミノ（2マス）を生成
+    generateSlot1Block: function() {
+        const blocks = [];
         for (let i = 0; i < BlockManager.blockShapes.length; i++) {
             const shape = BlockManager.blockShapes[i];
             const size = this.getBlockSize(shape);
-            if (size >= 4) {
-                largeBlocks.push(shape);
+            if (size >= 1 && size <= 2) {
+                blocks.push(shape);
             }
         }
-        const randomIndex = Math.floor(Math.random() * largeBlocks.length);
-        return largeBlocks[randomIndex];
+        const randomIndex = Math.floor(Math.random() * blocks.length);
+        return blocks[randomIndex];
     },
 
-    // ランダムなブロックを生成
-    generateRandomBlock: function() {
-        const allBlocks = BlockManager.blockShapes;
-        const randomIndex = Math.floor(Math.random() * allBlocks.length);
-        return allBlocks[randomIndex];
+    // 2枠目: トロミノ（3マス）もしくはテトリミノ（4マス）を生成
+    generateSlot2Block: function() {
+        const blocks = [];
+        for (let i = 0; i < BlockManager.blockShapes.length; i++) {
+            const shape = BlockManager.blockShapes[i];
+            const size = this.getBlockSize(shape);
+            if (size >= 3 && size <= 4) {
+                blocks.push(shape);
+            }
+        }
+        const randomIndex = Math.floor(Math.random() * blocks.length);
+        return blocks[randomIndex];
+    },
+
+    // 3枠目: テトリミノ（4マス）もしくはペントミノ（5マス）を生成
+    generateSlot3Block: function() {
+        const blocks = [];
+        for (let i = 0; i < BlockManager.blockShapes.length; i++) {
+            const shape = BlockManager.blockShapes[i];
+            const size = this.getBlockSize(shape);
+            if (size >= 4 && size <= 5) {
+                blocks.push(shape);
+            }
+        }
+        const randomIndex = Math.floor(Math.random() * blocks.length);
+        return blocks[randomIndex];
     },
 
     // 3つのブロックを生成してサイズ順にソート
     generateShopBlocks: function() {
         const blocks = [];
 
-        // 1つ目: 小さいブロック（1-2マス）
+        // 1枠目: モノミノもしくはドミノ（1-2マス）
         blocks.push({
-            shape: this.generateSmallBlock(),
+            shape: this.generateSlot1Block(),
             id: 'shop-block-0'
         });
 
-        // 2つ目: テトリミノ以上のブロック（4マス以上）
+        // 2枠目: トロミノもしくはテトリミノ（3-4マス）
         blocks.push({
-            shape: this.generateLargeBlock(),
+            shape: this.generateSlot2Block(),
             id: 'shop-block-1'
         });
 
-        // 3つ目: ランダム
+        // 3枠目: テトリミノもしくはペントミノ（4-5マス）
         blocks.push({
-            shape: this.generateRandomBlock(),
+            shape: this.generateSlot3Block(),
             id: 'shop-block-2'
         });
 
