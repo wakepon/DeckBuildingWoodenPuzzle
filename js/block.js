@@ -360,30 +360,38 @@ var BlockManager = {
         // UI更新
         GameUI.updatePlacementInfo(this.gameState.blocksPlacedCount, this.gameState.round);
 
-        // 12ブロック配置したかチェック
-        if (this.gameState.blocksPlacedCount >= 12) {
-            setTimeout(() => {
+        // スコア加算アニメーション完了後にスコアチェック
+        // animateScoreIncrement()のduration(800ms) + スコア演出の遅延(1000ms) + 余裕(200ms)
+        const scoreAnimationTime = maxAnimationTime + 2000;
+
+        setTimeout(() => {
+            // 目標スコアに達成したかチェック
+            const targetScore = this.gameState.round * 20;
+            if (this.gameState.score >= targetScore) {
+                // 目標達成！ラウンド終了
+                GameUI.showRoundEnd(this.gameState.round);
+                return;
+            }
+
+            // 12ブロック配置したかチェック
+            if (this.gameState.blocksPlacedCount >= 12) {
                 // ラウンド終了
                 GameUI.showRoundEnd(this.gameState.round);
-            }, maxAnimationTime + 50);
-            return;
-        }
+                return;
+            }
 
-        // 3つすべて配置したかチェック
-        const allPlaced = this.gameState.currentBlocks.every(b => b.placed);
-        if (allPlaced) {
-            setTimeout(() => {
+            // 3つすべて配置したかチェック
+            const allPlaced = this.gameState.currentBlocks.every(b => b.placed);
+            if (allPlaced) {
                 // 次の3つを引く（デッキが尽きても自動的に再シャッフルされる）
                 this.gameState.currentBlocks = this.drawBlocks();
                 this.render();
                 this.checkGameOver();
-            }, maxAnimationTime + 50);
-        } else {
-            // ライン消去アニメーション完了後にゲームオーバーチェック
-            setTimeout(() => {
+            } else {
+                // ゲームオーバーチェック
                 this.checkGameOver();
-            }, maxAnimationTime + 50);
-        }
+            }
+        }, scoreAnimationTime);
     },
 
     // 次のラウンドを開始
