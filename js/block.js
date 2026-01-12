@@ -338,8 +338,44 @@ var BlockManager = {
     // ゲームオーバーチェック
     checkGameOver: function() {
         if (!this.canPlaceAnyBlock()) {
-            GameUI.saveHighScore();
-            GameUI.showGameOver();
+            // 配置できないブロックの数を数える
+            let unplaceableCount = 0;
+            for (const block of this.gameState.currentBlocks) {
+                if (!block.placed) {
+                    unplaceableCount++;
+                }
+            }
+
+            // ダイアログを表示して、コールバックで後処理を実行
+            GameUI.showCannotPlaceDialog(() => {
+                // 配置できないブロックをすべて「配置済み」としてマーク
+                for (const block of this.gameState.currentBlocks) {
+                    if (!block.placed) {
+                        block.placed = true;
+                        this.gameState.blocksPlacedCount++;
+                    }
+                }
+
+                // UI更新
+                this.render();
+                GameUI.updatePlacementInfo(this.gameState.blocksPlacedCount, this.gameState.round);
+
+                // 残りの配置可能数が12に達したかチェック
+                if (this.gameState.blocksPlacedCount >= 12) {
+                    // ラウンド終了処理
+                    this.gameState.roundEnding = true;
+                    GameUI.showRoundEnd(this.gameState.round);
+                } else {
+                    // まだ残りがある場合は次の3つを引く
+                    const allPlaced = this.gameState.currentBlocks.every(b => b.placed);
+                    if (allPlaced) {
+                        this.gameState.currentBlocks = this.drawBlocks();
+                        this.render();
+                        // 再度チェック（新しいブロックも置けない場合がある）
+                        this.checkGameOver();
+                    }
+                }
+            });
         }
     },
 
