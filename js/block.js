@@ -397,6 +397,8 @@ var BlockManager = {
     // 次のラウンドを開始
     startNextRound: function() {
         this.gameState.round++;
+        // スコアをリセット
+        GameUI.resetScore();
         // ボードをリセット
         GameBoard.clear();
         // 初期デッキのコピーをシャッフルして再利用（新しいデッキは作成しない）
