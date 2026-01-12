@@ -185,12 +185,12 @@ var GameBoard = {
                 }
             });
 
-            // ゴールド獲得（消滅した単位ブロック数 × 同時に消滅したライン数）
+            // スコア獲得（消滅した単位ブロック数 × 同時に消滅したライン数）
             const totalLines = rows.length + cols.length;
             const totalBlocks = cellsToAnimate.length;
             if (totalLines > 0 && totalBlocks > 0) {
-                const goldAmount = totalBlocks * totalLines;
-                GameUI.updateGold(goldAmount);
+                const scoreAmount = totalBlocks * totalLines;
+                GameUI.updateScore(scoreAmount);
             }
         }, totalAnimationTime);
     }
