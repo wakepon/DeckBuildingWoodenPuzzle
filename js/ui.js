@@ -178,6 +178,29 @@ var GameUI = {
         }
     },
 
+    // 「どこにもブロックを置けません」ダイアログを表示
+    showCannotPlaceDialog: function(callback) {
+        const dialog = document.getElementById('cannot-place-dialog');
+        if (!dialog) {
+            // ダイアログ要素が存在しない場合でもコールバックを呼ぶ
+            if (callback) {
+                setTimeout(callback, 3000);
+            }
+            return;
+        }
+
+        dialog.textContent = 'どこにもブロックを置けません';
+        dialog.classList.add('show');
+
+        // 3秒後に非表示にしてコールバックを実行
+        setTimeout(() => {
+            dialog.classList.remove('show');
+            if (callback) {
+                callback();
+            }
+        }, 3000);
+    },
+
     // データリセット機能
     resetData: function() {
         if (confirm('データをリセットしますか？')) {
