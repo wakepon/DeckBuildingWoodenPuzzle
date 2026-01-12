@@ -4,57 +4,23 @@
 var Shop = {
     shopBlocks: [], // ショップに表示する3つのブロック
 
-    // ブロックのサイズ（マス数）を計算
-    getBlockSize: function(shape) {
-        let size = 0;
-        for (let row = 0; row < shape.length; row++) {
-            for (let col = 0; col < shape[row].length; col++) {
-                if (shape[row][col]) {
-                    size++;
-                }
-            }
-        }
-        return size;
-    },
-
     // 1枠目: モノミノ（1マス）もしくはドミノ（2マス）を生成
     generateSlot1Block: function() {
-        const blocks = [];
-        for (let i = 0; i < BlockManager.blockShapes.length; i++) {
-            const shape = BlockManager.blockShapes[i];
-            const size = this.getBlockSize(shape);
-            if (size >= 1 && size <= 2) {
-                blocks.push(shape);
-            }
-        }
+        const blocks = BlockShapes.filterBySize(1, 2);
         const randomIndex = Math.floor(Math.random() * blocks.length);
         return blocks[randomIndex];
     },
 
     // 2枠目: トロミノ（3マス）もしくはテトリミノ（4マス）を生成
     generateSlot2Block: function() {
-        const blocks = [];
-        for (let i = 0; i < BlockManager.blockShapes.length; i++) {
-            const shape = BlockManager.blockShapes[i];
-            const size = this.getBlockSize(shape);
-            if (size >= 3 && size <= 4) {
-                blocks.push(shape);
-            }
-        }
+        const blocks = BlockShapes.filterBySize(3, 4);
         const randomIndex = Math.floor(Math.random() * blocks.length);
         return blocks[randomIndex];
     },
 
     // 3枠目: テトリミノ（4マス）もしくはペントミノ（5マス）を生成
     generateSlot3Block: function() {
-        const blocks = [];
-        for (let i = 0; i < BlockManager.blockShapes.length; i++) {
-            const shape = BlockManager.blockShapes[i];
-            const size = this.getBlockSize(shape);
-            if (size >= 4 && size <= 5) {
-                blocks.push(shape);
-            }
-        }
+        const blocks = BlockShapes.filterBySize(4, 5);
         const randomIndex = Math.floor(Math.random() * blocks.length);
         return blocks[randomIndex];
     },
@@ -83,7 +49,7 @@ var Shop = {
 
         // サイズ順にソート（小さい順）
         blocks.sort((a, b) => {
-            return this.getBlockSize(a.shape) - this.getBlockSize(b.shape);
+            return BlockShapes.getSize(a.shape) - BlockShapes.getSize(b.shape);
         });
 
         // IDを再割り当て（ソート後）
@@ -94,47 +60,21 @@ var Shop = {
         return blocks;
     },
 
-    // ブロック要素を作成
+    // ブロック要素を作成（BlockRendererを使用）
     createShopBlockElement: function(block) {
-        const blockDiv = document.createElement('div');
-        blockDiv.className = 'shop-block';
-        blockDiv.dataset.blockId = block.id;
-
-        const rows = block.shape.length;
-        const cols = block.shape[0].length;
-
-        // 画面幅に応じてセルサイズを調整
-        let cellSize = 35;
-        if (window.innerWidth <= 380) {
-            cellSize = 25;
-        } else if (window.innerWidth <= 480) {
-            cellSize = 28;
-        }
-
-        blockDiv.style.gridTemplateColumns = `repeat(${cols}, ${cellSize}px)`;
-        blockDiv.style.gridTemplateRows = `repeat(${rows}, ${cellSize}px)`;
-
-        for (let row = 0; row < rows; row++) {
-            for (let col = 0; col < cols; col++) {
-                const cellDiv = document.createElement('div');
-                cellDiv.className = 'shop-block-cell';
-
-                if (!block.shape[row][col]) {
-                    cellDiv.style.visibility = 'hidden';
-                }
-
-                blockDiv.appendChild(cellDiv);
+        const cellSize = BlockRenderer.getResponsiveCellSize(true);
+        return BlockRenderer.createBlockElement({
+            shape: block.shape,
+            blockId: block.id,
+            cellSize: cellSize,
+            className: 'shop-block',
+            cellClassName: 'shop-block-cell',
+            onClick: () => this.selectBlock(block),
+            onTouchEnd: (e) => {
+                e.preventDefault();
+                this.selectBlock(block);
             }
-        }
-
-        // クリック/タップイベント
-        blockDiv.addEventListener('click', () => this.selectBlock(block));
-        blockDiv.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            this.selectBlock(block);
         });
-
-        return blockDiv;
     },
 
     // ショップを表示
