@@ -164,6 +164,9 @@ var GameUI = {
                     deckInfoElement.style.color = '';
                     deckInfoElement.style.fontWeight = '';
 
+                    // ラウンド終了フラグをリセット
+                    BlockManager.gameState.roundEnding = false;
+
                     // ショップを表示
                     Shop.show();
                 }, 3000);

@@ -9,7 +9,8 @@ var BlockManager = {
         currentBlocks: [],     // 現在の手札（3つ）
         round: 1,              // 現在のラウンド
         score: 0,              // 現在のスコア
-        blocksPlacedCount: 0   // 現在のラウンドで配置したブロック数
+        blocksPlacedCount: 0,  // 現在のラウンドで配置したブロック数
+        roundEnding: false     // ラウンド終了処理中フラグ
     },
 
     // ブロックの定義（形状）- 3x3以内の全パターン（回転も別パターンとして扱う）
@@ -344,6 +345,11 @@ var BlockManager = {
 
     // ブロックを配置
     placeBlock: function(row, col, block) {
+        // ラウンド終了処理中は配置できない
+        if (this.gameState.roundEnding) {
+            return;
+        }
+
         GameBoard.place(row, col, block.shape);
 
         block.placed = true;
@@ -362,6 +368,7 @@ var BlockManager = {
             const targetScore = this.gameState.round * 20;
             if (this.gameState.score >= targetScore) {
                 // 目標達成！ラウンド終了
+                this.gameState.roundEnding = true;
                 GameUI.showRoundEnd(this.gameState.round);
                 return;
             }
@@ -369,6 +376,7 @@ var BlockManager = {
             // 12ブロック配置したかチェック
             if (this.gameState.blocksPlacedCount >= 12) {
                 // ラウンド終了
+                this.gameState.roundEnding = true;
                 GameUI.showRoundEnd(this.gameState.round);
                 return;
             }
@@ -398,6 +406,8 @@ var BlockManager = {
         this.gameState.deck = this.shuffleDeck([...this.gameState.initialDeck]);
         // 配置カウンターをリセット
         this.gameState.blocksPlacedCount = 0;
+        // ラウンド終了フラグをリセット
+        this.gameState.roundEnding = false;
         this.gameState.currentBlocks = this.drawBlocks();
         this.render();
         GameUI.updatePlacementInfo(this.gameState.blocksPlacedCount, this.gameState.round);
