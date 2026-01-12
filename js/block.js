@@ -8,8 +8,7 @@ var BlockManager = {
         deck: [],           // 残りのデッキ
         currentBlocks: [],  // 現在の手札（3つ）
         round: 1,           // 現在のラウンド
-        gold: 0,            // 所持ゴールド
-        taxRate: 1          // 現在の税金額（初回は1）
+        score: 0            // 現在のスコア
     },
 
     // ブロックの定義（形状）- 3x3以内の全パターン（回転も別パターンとして扱う）
@@ -239,6 +238,7 @@ var BlockManager = {
 
         // UI更新
         GameUI.updateDeckInfo(this.gameState.deck.length + this.gameState.currentBlocks.length, this.gameState.round);
+        GameUI.updateTargetScore(this.gameState.round);
 
         this.checkGameOver();
     },
@@ -382,6 +382,7 @@ var BlockManager = {
         this.gameState.currentBlocks = this.drawBlocks();
         this.render();
         GameUI.updateDeckInfo(this.gameState.deck.length + this.gameState.currentBlocks.length, this.gameState.round);
+        GameUI.updateTargetScore(this.gameState.round);
         this.checkGameOver();
     },
 

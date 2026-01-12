@@ -24,16 +24,22 @@ var GameUI = {
         }
     },
 
-    // ゴールド更新
-    updateGold: function(amount) {
-        BlockManager.gameState.gold += amount;
-        document.getElementById('gold-display').textContent = `💰 ゴールド: ${BlockManager.gameState.gold}`;
+    // スコア更新
+    updateScore: function(amount) {
+        BlockManager.gameState.score += amount;
+        document.getElementById('score-display').textContent = `スコア: ${BlockManager.gameState.score}`;
     },
 
-    // ゴールドリセット
-    resetGold: function() {
-        BlockManager.gameState.gold = 0;
-        document.getElementById('gold-display').textContent = `💰 ゴールド: 0`;
+    // スコアリセット
+    resetScore: function() {
+        BlockManager.gameState.score = 0;
+        document.getElementById('score-display').textContent = `スコア: 0`;
+    },
+
+    // 目標スコア表示更新
+    updateTargetScore: function(round) {
+        const targetScore = round * 20;
+        document.getElementById('target-score-display').textContent = `目標スコア: ${targetScore}`;
     },
 
     // ゲームオーバー画面を表示
@@ -63,27 +69,19 @@ var GameUI = {
     showRoundEnd: function(round) {
         const deckInfoElement = document.getElementById('deck-info');
         if (deckInfoElement) {
-            const taxAmount = BlockManager.gameState.taxRate;
+            const targetScore = round * 20;
+            const currentScore = BlockManager.gameState.score;
 
-            // 税金表示
-            deckInfoElement.textContent = `ラウンド ${round} 終了！ 税金: ${taxAmount}ゴールド`;
-            deckInfoElement.style.background = 'linear-gradient(135deg, #f57c00 0%, #e65100 100%)';
-            deckInfoElement.style.color = '#fff';
-            deckInfoElement.style.fontWeight = 'bold';
+            // 目標スコア判定
+            if (currentScore >= targetScore) {
+                // 目標達成！
+                deckInfoElement.textContent = `ラウンド ${round} クリア！ 目標達成！`;
+                deckInfoElement.style.background = 'linear-gradient(135deg, #66bb6a 0%, #43a047 100%)';
+                deckInfoElement.style.color = '#fff';
+                deckInfoElement.style.fontWeight = 'bold';
 
-            // 3秒後に税金支払い処理
-            setTimeout(() => {
-                // 税金判定時に最新のゴールド額を取得（ライン消去で獲得したゴールドを含む）
-                const currentGold = BlockManager.gameState.gold;
-
-                if (currentGold >= taxAmount) {
-                    // 税金支払い可能
-                    BlockManager.gameState.gold -= taxAmount;
-                    this.updateGold(0); // 表示更新
-
-                    // 次のラウンドの税金を計算（1, 2, 3, 4, 5...）
-                    BlockManager.gameState.taxRate += 1;
-
+                // 3秒後にショップ表示
+                setTimeout(() => {
                     // UI リセット
                     deckInfoElement.style.background = '';
                     deckInfoElement.style.color = '';
@@ -91,12 +89,12 @@ var GameUI = {
 
                     // ショップを表示
                     Shop.show();
-                } else {
-                    // 税金支払い不可 → ゲームオーバー
-                    this.saveHighScore();
-                    this.showGameOver(`税金を支払えませんでした（必要: ${taxAmount}ゴールド、所持: ${currentGold}ゴールド）`);
-                }
-            }, 3000);
+                }, 3000);
+            } else {
+                // 目標未達成 → ゲームオーバー
+                this.saveHighScore();
+                this.showGameOver(`目標スコアに到達できませんでした（目標: ${targetScore}、獲得: ${currentScore}）`);
+            }
         }
     }
 };
