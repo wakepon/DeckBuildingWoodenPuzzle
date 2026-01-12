@@ -24,10 +24,78 @@ var GameUI = {
         }
     },
 
-    // スコア更新
+    // スコア更新（演出なし）
     updateScore: function(amount) {
         BlockManager.gameState.score += amount;
         document.getElementById('score-display').textContent = `スコア: ${BlockManager.gameState.score}`;
+    },
+
+    // 単位ブロック「+1」ポップアップを表示
+    showBlockPopup: function(x, y) {
+        const popup = document.createElement('div');
+        popup.className = 'block-popup';
+        popup.textContent = '+1';
+        popup.style.left = x + 'px';
+        popup.style.top = y + 'px';
+        document.body.appendChild(popup);
+
+        // アニメーション終了後に削除
+        setTimeout(() => {
+            if (popup.parentNode) {
+                popup.parentNode.removeChild(popup);
+            }
+        }, 600);
+    },
+
+    // スコア計算演出を表示
+    showScoreCalculation: function(totalBlocks, totalLines, scoreAmount) {
+        const display = document.getElementById('score-effect-display');
+        if (!display) return;
+
+        // 第1段階: ブロック数 × ライン数
+        display.innerHTML = `${totalBlocks}<br>×<br>${totalLines}ライン`;
+        display.classList.add('show');
+
+        // 1秒後に第2段階: 計算結果とスコアインクリメント
+        setTimeout(() => {
+            display.innerHTML = `${scoreAmount}`;
+            this.animateScoreIncrement(scoreAmount);
+        }, 1000);
+
+        // さらに1秒後に非表示
+        setTimeout(() => {
+            display.classList.remove('show');
+        }, 2000);
+    },
+
+    // スコアのインクリメントアニメーション
+    animateScoreIncrement: function(targetAmount) {
+        const startScore = BlockManager.gameState.score;
+        const endScore = startScore + targetAmount;
+        const duration = 800; // 0.8秒
+        const startTime = Date.now();
+
+        const animate = () => {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+
+            // イージング関数（easeOutCubic）
+            const easeProgress = 1 - Math.pow(1 - progress, 3);
+            const currentScore = Math.floor(startScore + (targetAmount * easeProgress));
+
+            BlockManager.gameState.score = currentScore;
+            document.getElementById('score-display').textContent = `スコア: ${currentScore}`;
+
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            } else {
+                // 最終的な正確な値を設定
+                BlockManager.gameState.score = endScore;
+                document.getElementById('score-display').textContent = `スコア: ${endScore}`;
+            }
+        };
+
+        requestAnimationFrame(animate);
     },
 
     // スコアリセット
