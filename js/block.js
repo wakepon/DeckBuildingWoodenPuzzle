@@ -4,7 +4,7 @@
 var BlockManager = {
     // ゲームステート
     gameState: {
-        initialDeck: [],       // 最初に決めた9種類のブロック（ラウンド間で共有）
+        initialDeck: [],       // 最初に決めた8種類のブロック（ラウンド間で共有）
         deck: [],              // 残りのデッキ
         currentBlocks: [],     // 現在の手札（3つ）
         round: 1,              // 現在のラウンド
@@ -186,15 +186,23 @@ var BlockManager = {
         [[1, 1, 1], [1, 1, 1], [1, 1, 1]]
     ],
 
-    // デッキを作成（9種類のブロックをランダムに選択）
+    // デッキを作成（固定の8種類のブロック）
     createDeck: function() {
-        const deck = [];
-        const shapes = CONFIG.DECK_BLOCK_SHAPES;
+        const deck = [
+            // モノミノ（1種類）
+            [[1]],
 
-        for (let i = 0; i < 9; i++) {
-            const randomIndex = Math.floor(Math.random() * shapes.length);
-            deck.push(shapes[randomIndex]);
-        }
+            // ドミノ（2種類）
+            [[1, 1]],        // 1×2 横
+            [[1], [1]],      // 2×1 縦
+
+            // トロミノ（5種類）
+            [[1, 1, 1]],     // 1×3 横
+            [[1], [1], [1]], // 3×1 縦
+            [[1, 0], [1, 1]], // L字型
+            [[1, 1], [1, 0]], // L字型（鏡）
+            [[0, 1], [1, 1]]  // L字型（回転）
+        ];
 
         return deck;
     },
