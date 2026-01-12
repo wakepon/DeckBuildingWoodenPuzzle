@@ -75,6 +75,31 @@
             font-family: monospace;
         }
 
+        #settings-icon {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(62, 39, 35, 0.7);
+            color: #fff;
+            font-size: 24px;
+            padding: 8px 12px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        #settings-icon:hover {
+            background: rgba(62, 39, 35, 0.9);
+            transform: scale(1.1);
+        }
+
+        #settings-icon:active {
+            transform: scale(0.95);
+        }
+
         #game-over-screen {
             position: fixed;
             top: 0;
@@ -517,6 +542,7 @@
 </head>
 <body>
     <div id="version-display"></div>
+    <div id="settings-icon">⚙️</div>
     <h1>Woody Puzzle</h1>
     <div id="highscore-display">最高ラウンド: 1</div>
     <div id="score-display">スコア: 0</div>
