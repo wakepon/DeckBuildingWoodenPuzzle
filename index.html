@@ -303,6 +303,91 @@
             }
         }
 
+        /* スコア演出用のスタイル */
+        .block-popup {
+            position: fixed;
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            pointer-events: none;
+            z-index: 1500;
+            animation: blockPopupAnimation 0.6s ease-out forwards;
+        }
+
+        @keyframes blockPopupAnimation {
+            0% {
+                opacity: 0;
+                transform: translateY(0) scale(0.5);
+            }
+            30% {
+                opacity: 1;
+                transform: translateY(-30px) scale(1.2);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-60px) scale(1);
+            }
+        }
+
+        #score-effect-display {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(62, 39, 35, 0.95);
+            color: #ffd700;
+            font-size: 48px;
+            font-weight: bold;
+            padding: 30px 50px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            z-index: 1600;
+            pointer-events: none;
+            text-align: center;
+            line-height: 1.5;
+            display: none;
+        }
+
+        #score-effect-display.show {
+            display: block;
+            animation: scoreEffectFadeIn 0.3s ease-out;
+        }
+
+        @keyframes scoreEffectFadeIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .block-popup {
+                font-size: 20px;
+            }
+
+            #score-effect-display {
+                font-size: 36px;
+                padding: 20px 40px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .block-popup {
+                font-size: 18px;
+            }
+
+            #score-effect-display {
+                font-size: 28px;
+                padding: 15px 30px;
+            }
+        }
+
         #blocks-container {
             display: flex;
             justify-content: center;
@@ -442,6 +527,8 @@
         <div id="board"></div>
         <div id="blocks-container"></div>
     </div>
+
+    <div id="score-effect-display"></div>
 
     <div id="game-over-screen" style="display: none;">
         <div id="game-over-content">

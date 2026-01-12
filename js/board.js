@@ -157,7 +157,7 @@ var GameBoard = {
             }
         });
 
-        // 各セルにアニメーションを適用
+        // 各セルにアニメーションを適用 + 「+1」ポップアップを表示
         cellsToAnimate.forEach(cellData => {
             setTimeout(() => {
                 const cellElement = document.querySelector(
@@ -165,6 +165,12 @@ var GameBoard = {
                 );
                 if (cellElement) {
                     cellElement.classList.add('clearing');
+
+                    // セルの中心座標を取得して「+1」ポップアップを表示
+                    const rect = cellElement.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+                    GameUI.showBlockPopup(centerX, centerY);
                 }
             }, cellData.delay);
         });
@@ -185,12 +191,13 @@ var GameBoard = {
                 }
             });
 
-            // スコア獲得（消滅した単位ブロック数 × 同時に消滅したライン数）
+            // スコア演出を表示（消滅した単位ブロック数 × 同時に消滅したライン数）
             const totalLines = rows.length + cols.length;
             const totalBlocks = cellsToAnimate.length;
             if (totalLines > 0 && totalBlocks > 0) {
                 const scoreAmount = totalBlocks * totalLines;
-                GameUI.updateScore(scoreAmount);
+                // スコア計算演出を表示（演出内でスコアがインクリメントされる）
+                GameUI.showScoreCalculation(totalBlocks, totalLines, scoreAmount);
             }
         }, totalAnimationTime);
     }
