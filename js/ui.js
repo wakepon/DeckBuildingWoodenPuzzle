@@ -56,12 +56,12 @@ var GameUI = {
         document.getElementById('game-over-screen').style.display = 'none';
     },
 
-    // デッキ情報を更新
-    updateDeckInfo: function(remainingBlocks, round) {
+    // 配置情報を更新
+    updatePlacementInfo: function(blocksPlaced, round) {
         const deckInfoElement = document.getElementById('deck-info');
         if (deckInfoElement) {
-            const totalDeckSize = BlockManager.gameState.initialDeck.length;
-            deckInfoElement.textContent = `ラウンド ${round} - 残りブロック: ${remainingBlocks}/${totalDeckSize}`;
+            const remaining = 12 - blocksPlaced;
+            deckInfoElement.textContent = `ラウンド ${round} - 残り配置数: ${remaining}/12`;
         }
     },
 
