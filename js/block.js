@@ -360,9 +360,8 @@ var BlockManager = {
         // UI更新
         GameUI.updatePlacementInfo(this.gameState.blocksPlacedCount, this.gameState.round);
 
-        // スコア加算アニメーション完了後にスコアチェック
-        // animateScoreIncrement()のduration(800ms) + スコア演出の遅延(1000ms) + 余裕(200ms)
-        const scoreAnimationTime = maxAnimationTime + 2000;
+        // ライン消去アニメーション完了後にスコアチェック
+        const scoreAnimationTime = maxAnimationTime;
 
         setTimeout(() => {
             // 目標スコアに達成したかチェック
