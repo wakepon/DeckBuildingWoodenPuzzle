@@ -138,5 +138,33 @@ var InputHandler = {
         document.removeEventListener('touchend', InputHandler.onDragEnd);
 
         InputHandler.draggedBlock = null;
+    },
+
+    // 入力ハンドラーをリセット
+    reset: function() {
+        // イベントリスナーをすべて削除
+        document.removeEventListener('mousemove', this.onDragMove);
+        document.removeEventListener('mouseup', this.onDragEnd);
+        document.removeEventListener('touchmove', this.onTouchMove);
+        document.removeEventListener('touchend', this.onDragEnd);
+
+        // ドラッグプレビューを削除
+        if (this.dragPreview) {
+            this.dragPreview.remove();
+            this.dragPreview = null;
+        }
+
+        // すべてのハイライトをクリア
+        document.querySelectorAll('.cell').forEach(cell => {
+            cell.classList.remove('highlight', 'invalid');
+        });
+
+        // draggingクラスを削除
+        document.querySelectorAll('.block.dragging').forEach(block => {
+            block.classList.remove('dragging');
+        });
+
+        // 状態をリセット
+        this.draggedBlock = null;
     }
 };
