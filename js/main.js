@@ -9,6 +9,9 @@ function initGame() {
 
 // ゲームリスタート
 function restartGame() {
+    // 入力ハンドラーをリセット
+    InputHandler.reset();
+
     // ボードをクリア
     GameBoard.clear();
 
