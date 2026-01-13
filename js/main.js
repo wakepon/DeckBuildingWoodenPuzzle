@@ -12,17 +12,24 @@ function restartGame() {
     // 入力ハンドラーをリセット
     InputHandler.reset();
 
+    // UIリセット
+    GameUI.hideGameOver();
+
     // ボードをクリア
     GameBoard.clear();
 
     // スコアリセット
     GameUI.resetScore();
 
-    // UIリセット
-    GameUI.hideGameOver();
-
-    // ラウンドをリセット
+    // ゲームステートを完全にリセット
     BlockManager.gameState.round = 1;
+    BlockManager.gameState.score = 0;
+    BlockManager.gameState.blocksPlacedCount = 0;
+    BlockManager.gameState.roundEnding = false;
+    BlockManager.gameState.currentBlocks = [];
+
+    // デッキマネージャーを初期化（ショップで追加されたブロックもクリア）
+    DeckManager.init();
 
     // 新しいブロックを生成
     BlockManager.init();
