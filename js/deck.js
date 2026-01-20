@@ -18,6 +18,15 @@ var DeckManager = {
         });
     },
 
+    // initialDeckの深いコピーを作成（ショップで追加されたブロックを含む）
+    copyInitialDeck: function() {
+        return this.state.initialDeck.map(function(shape) {
+            return shape.map(function(row) {
+                return row.slice();
+            });
+        });
+    },
+
     // デッキをシャッフル
     shuffle: function(deck) {
         const shuffled = deck.slice();
@@ -35,16 +44,18 @@ var DeckManager = {
         const blocks = [];
 
         for (let i = 0; i < count; i++) {
-            // デッキが空になったら再シャッフル
+            // デッキが空になったら再シャッフル（initialDeckを使用）
             if (this.state.deck.length === 0) {
-                this.state.deck = this.shuffle(this.createDeck());
+                this.state.deck = this.shuffle(this.copyInitialDeck());
             }
 
             const shape = this.state.deck.shift();
             blocks.push({
                 id: Date.now() + i,
                 shape: shape,
-                placed: false
+                placed: false,
+                pattern: null,  // パターンID or null
+                seals: PatternManager.createEmptySeals(shape)  // シール配列
             });
         }
 
@@ -66,8 +77,14 @@ var DeckManager = {
         this.state.initialDeck.push(shapeCopy);
     },
 
-    // 次のラウンド用にデッキをリセット
+    // 次のラウンド用にデッキをリセット（initialDeckを使用）
     reset: function() {
-        this.state.deck = this.shuffle(this.createDeck());
+        this.state.deck = this.shuffle(this.copyInitialDeck());
+    },
+
+    // デッキ状態を設定（復元用）
+    setState: function(stateData) {
+        this.state.initialDeck = stateData.initialDeck;
+        this.state.deck = stateData.deck;
     }
 };

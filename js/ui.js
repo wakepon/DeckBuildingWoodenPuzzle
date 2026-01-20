@@ -3,6 +3,7 @@
 // UI管理オブジェクト
 var GameUI = {
     highScore: 1,
+    gold: 0, // 所持ゴールド
     gameOverReason: '', // ゲームオーバーの理由
 
     // ハイスコアの読み込み
@@ -126,6 +127,11 @@ var GameUI = {
         document.getElementById('final-round').textContent = `到達ラウンド: ${BlockManager.gameState.round}`;
         document.getElementById('final-highscore').textContent = `最高ラウンド: ${this.highScore}`;
         document.getElementById('game-over-screen').style.display = 'flex';
+
+        // ゴールドを0にリセット
+        this.gold = 0;
+        this.updateGoldDisplay();
+        this.saveGold();
     },
 
     // ゲームオーバー画面を非表示
@@ -157,7 +163,7 @@ var GameUI = {
                 deckInfoElement.style.color = '#fff';
                 deckInfoElement.style.fontWeight = 'bold';
 
-                // 3秒後にショップ表示
+                // 3秒後にブロック選択画面を表示
                 setTimeout(() => {
                     // UI リセット
                     deckInfoElement.style.background = '';
@@ -167,8 +173,8 @@ var GameUI = {
                     // ラウンド終了フラグをリセット
                     BlockManager.gameState.roundEnding = false;
 
-                    // ショップを表示
-                    Shop.show();
+                    // ブロック選択画面を表示
+                    BlockSelect.show();
                 }, 3000);
             } else {
                 // 目標未達成 → ゲームオーバー
@@ -199,6 +205,107 @@ var GameUI = {
                 callback();
             }
         }, 3000);
+    },
+
+    // ゴールドの読み込み
+    loadGold: function() {
+        const saved = localStorage.getItem(CONFIG.GOLD.STORAGE_KEY);
+        if (saved) {
+            this.gold = parseInt(saved, 10);
+        } else {
+            this.gold = 0;
+        }
+        this.updateGoldDisplay();
+    },
+
+    // ゴールドの保存
+    saveGold: function() {
+        localStorage.setItem(CONFIG.GOLD.STORAGE_KEY, this.gold.toString());
+    },
+
+    // ゴールド表示更新（演出なし）
+    updateGoldDisplay: function() {
+        document.getElementById('gold-display').textContent = `${this.gold} G`;
+    },
+
+    // ゴールドのインクリメントアニメーション
+    animateGoldIncrement: function(targetAmount, callback) {
+        const startGold = this.gold;
+        const endGold = startGold + targetAmount;
+        const duration = CONFIG.GOLD.ANIMATION_DURATION;
+        const startTime = Date.now();
+        const self = this;
+
+        const animate = function() {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+
+            // イージング関数（easeOutCubic）
+            const easeProgress = 1 - Math.pow(1 - progress, 3);
+            const currentGold = Math.floor(startGold + (targetAmount * easeProgress));
+
+            self.gold = currentGold;
+            self.updateGoldDisplay();
+
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            } else {
+                // 最終的な正確な値を設定
+                self.gold = endGold;
+                self.updateGoldDisplay();
+                self.saveGold();
+
+                // コールバックが指定されている場合は実行
+                if (callback) {
+                    callback();
+                }
+            }
+        };
+
+        requestAnimationFrame(animate);
+    },
+
+    // ゴールド獲得ポップアップ表示
+    showGoldPopup: function(amount) {
+        const popup = document.createElement('div');
+        popup.className = 'gold-popup';
+        popup.textContent = '+' + amount + ' G';
+        document.body.appendChild(popup);
+
+        // アニメーション終了後に削除
+        setTimeout(function() {
+            if (popup.parentNode) {
+                popup.parentNode.removeChild(popup);
+            }
+        }, 1500);
+    },
+
+    // ゲーム状態の保存
+    saveGameState: function() {
+        var state = {
+            gameState: BlockManager.gameState,
+            board: GameBoard.board,
+            deckState: DeckManager.state,
+            relicState: RelicManager.state
+        };
+        localStorage.setItem(CONFIG.GAME_STATE_STORAGE_KEY, JSON.stringify(state));
+    },
+
+    // ゲーム状態の読み込み
+    loadGameState: function() {
+        var saved = localStorage.getItem(CONFIG.GAME_STATE_STORAGE_KEY);
+        if (!saved) return null;
+        return JSON.parse(saved);
+    },
+
+    // 保存された状態があるかチェック
+    hasGameState: function() {
+        return localStorage.getItem(CONFIG.GAME_STATE_STORAGE_KEY) !== null;
+    },
+
+    // ゲーム状態のクリア
+    clearGameState: function() {
+        localStorage.removeItem(CONFIG.GAME_STATE_STORAGE_KEY);
     },
 
     // データリセット機能

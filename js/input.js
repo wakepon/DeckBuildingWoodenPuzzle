@@ -14,7 +14,9 @@ var InputHandler = {
             shape: block.shape,
             cellSize: CONFIG.CELL_SIZE.DEFAULT,
             className: 'drag-preview',
-            cellClassName: 'block-cell'
+            cellClassName: 'block-cell',
+            pattern: block.pattern,
+            seals: block.seals
         });
 
         document.body.appendChild(this.dragPreview);
