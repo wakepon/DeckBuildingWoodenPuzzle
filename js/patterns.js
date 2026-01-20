@@ -23,6 +23,20 @@ var PatternManager = {
             description: '連続配置でボーナススコア',
             color: '#f39c12',
             icon: '🔥'
+        },
+        AURA: {
+            id: 'aura',
+            name: 'オーラブロック',
+            description: '配置時、隣接する既存ブロックにバフ付与（消去時+2点）',
+            color: '#9b59b6',
+            icon: '✨'
+        },
+        MOSS: {
+            id: 'moss',
+            name: '苔ブロック',
+            description: 'フィールド端と接している辺の数だけスコア加算',
+            color: '#27ae60',
+            icon: '🌿'
         }
     },
 
@@ -48,6 +62,13 @@ var PatternManager = {
             description: 'ライン消し時にこのブロックが2回カウントされる',
             color: '#3498db',
             icon: '✖'
+        },
+        STONE: {
+            id: 'stone',
+            name: '石',
+            description: 'このブロックは消えず、スコア計算にもカウントされない',
+            color: '#7f8c8d',
+            icon: '🪨'
         }
     },
 
