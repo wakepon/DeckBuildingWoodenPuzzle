@@ -91,7 +91,8 @@ var GameBoard = {
     },
 
     // 完成した行・列をチェック
-    checkAndClearLines: function(onComplete) {
+    // placedBlockSize: 配置したブロックのセル数（レリック効果判定用）
+    checkAndClearLines: function(onComplete, placedBlockSize) {
         const rowsToClear = [];
         const colsToClear = [];
 
@@ -118,7 +119,7 @@ var GameBoard = {
 
         // クリア処理
         if (rowsToClear.length > 0 || colsToClear.length > 0) {
-            this.clearLines(rowsToClear, colsToClear, onComplete);
+            this.clearLines(rowsToClear, colsToClear, onComplete, placedBlockSize);
         } else {
             // ラインがクリアされなかった場合もコールバックを呼ぶ
             if (onComplete) {
@@ -130,7 +131,10 @@ var GameBoard = {
     },
 
     // 行・列をクリア
-    clearLines: function(rows, cols, onComplete) {
+    // placedBlockSize: 配置したブロックのセル数（レリック効果判定用）
+    clearLines: function(rows, cols, onComplete, placedBlockSize) {
+        var self = this;
+
         // アニメーション用のセル配列（順序付き）
         const cellsToAnimate = [];
 
@@ -187,7 +191,7 @@ var GameBoard = {
         setTimeout(() => {
             // ボードとDOM要素をクリア
             cellsToAnimate.forEach(cellData => {
-                this.board[cellData.row][cellData.col] = false;
+                self.board[cellData.row][cellData.col] = false;
                 const cellElement = document.querySelector(
                     `[data-row="${cellData.row}"][data-col="${cellData.col}"]`
                 );
@@ -200,10 +204,41 @@ var GameBoard = {
             const totalLines = rows.length + cols.length;
             const totalBlocks = cellsToAnimate.length;
             if (totalLines > 0 && totalBlocks > 0) {
-                const scoreAmount = totalBlocks * totalLines;
+                var scoreAmount = totalBlocks * totalLines;
+
+                // レリック効果を適用
+                var relicEffects = RelicManager.calculateRelicEffects({
+                    totalLines: totalLines,
+                    totalBlocks: totalBlocks,
+                    placedBlockSize: placedBlockSize,
+                    isBoardEmpty: self.isBoardEmpty()
+                });
+
+                // 連鎖の達人: 複数ライン同時消しで1.5倍
+                if (relicEffects.chainMasterActive) {
+                    scoreAmount = Math.floor(scoreAmount * 1.5);
+                }
+
                 // スコア計算演出を表示（演出内でスコアがインクリメントされる）
-                // スコアアニメーション完了後にonCompleteコールバックを呼ぶ
-                GameUI.showScoreCalculation(totalBlocks, totalLines, scoreAmount, onComplete);
+                GameUI.showScoreCalculation(totalBlocks, totalLines, scoreAmount, function() {
+                    // スコアアニメーション完了後にレリックボーナスを適用
+
+                    // 小さな幸運: 3ブロックでライン消しすると+20
+                    if (relicEffects.smallLuckActive) {
+                        RelicManager.showRelicEffect('small_luck', '+20');
+                        GameUI.animateScoreIncrement(20);
+                    }
+
+                    // 全消しボーナス: 盤面が空になったら+20
+                    if (relicEffects.fullClearActive) {
+                        RelicManager.showRelicEffect('full_clear_bonus', '+20');
+                        GameUI.animateScoreIncrement(20, onComplete);
+                    } else {
+                        if (onComplete) {
+                            onComplete();
+                        }
+                    }
+                });
             } else {
                 // ラインがクリアされなかった場合もコールバックを呼ぶ
                 if (onComplete) {
@@ -211,5 +246,35 @@ var GameBoard = {
                 }
             }
         }, totalAnimationTime);
+    },
+
+    // ボードが完全に空かどうかをチェック
+    isBoardEmpty: function() {
+        for (var row = 0; row < CONFIG.BOARD_SIZE; row++) {
+            for (var col = 0; col < CONFIG.BOARD_SIZE; col++) {
+                if (this.board[row][col]) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    },
+
+    // ボード状態を設定（復元用）
+    setBoard: function(boardData) {
+        this.board = boardData;
+        // DOMを更新
+        for (var row = 0; row < CONFIG.BOARD_SIZE; row++) {
+            for (var col = 0; col < CONFIG.BOARD_SIZE; col++) {
+                var cell = document.querySelector('[data-row="' + row + '"][data-col="' + col + '"]');
+                if (cell) {
+                    if (this.board[row][col]) {
+                        cell.classList.add('filled');
+                    } else {
+                        cell.classList.remove('filled');
+                    }
+                }
+            }
+        }
     }
 };

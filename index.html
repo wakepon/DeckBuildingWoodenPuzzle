@@ -48,6 +48,51 @@
             background: linear-gradient(135deg, #8d6e63 0%, #795548 100%);
         }
 
+        #gold-display {
+            background: linear-gradient(135deg, #ffd700 0%, #ffb300 100%);
+            color: #3e2723;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+        }
+
+        .gold-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.5);
+            pointer-events: none;
+            z-index: 1800;
+            animation: goldPopupAnimation 1.5s ease-out forwards;
+        }
+
+        @keyframes goldPopupAnimation {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            20% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+            80% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -100%) scale(1);
+            }
+        }
+
         #deck-info {
             background: linear-gradient(135deg, #8d6e63 0%, #795548 100%);
             color: #fff;
@@ -75,6 +120,207 @@
             font-family: monospace;
         }
 
+        /* レリックパネル */
+        #relic-panel {
+            position: fixed;
+            left: 10px;
+            top: 80px;
+            width: 55px;
+            background: rgba(62, 39, 35, 0.85);
+            border-radius: 10px;
+            padding: 8px;
+            z-index: 100;
+            display: none;
+        }
+
+        #relic-panel-header {
+            color: #d7ccc8;
+            font-size: 10px;
+            text-align: center;
+            margin-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 5px;
+        }
+
+        #relic-list {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .relic-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #5d4037 0%, #4e342e 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .relic-icon:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .relic-icon.rarity-common {
+            border: 2px solid #9e9e9e;
+        }
+
+        .relic-icon.rarity-rare {
+            border: 2px solid #5fa8ff;
+        }
+
+        .relic-icon.rarity-epic {
+            border: 2px solid #b46eff;
+        }
+
+        /* レリックツールチップ */
+        #relic-tooltip {
+            position: fixed;
+            display: none;
+            background: rgba(50, 40, 30, 0.95);
+            color: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            z-index: 3000;
+            max-width: 220px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+        }
+
+        #relic-tooltip-name {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        #relic-tooltip-desc {
+            font-size: 13px;
+            color: #d7ccc8;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        #relic-tooltip-rarity {
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        #relic-tooltip-rarity.rarity-common {
+            color: #9e9e9e;
+        }
+
+        #relic-tooltip-rarity.rarity-rare {
+            color: #5fa8ff;
+        }
+
+        #relic-tooltip-rarity.rarity-epic {
+            color: #b46eff;
+        }
+
+        /* レリック効果発動時のアニメーション */
+        .relic-activated {
+            animation: relic-glow 1s ease-out;
+        }
+
+        @keyframes relic-glow {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            }
+            30% {
+                transform: scale(1.3);
+                box-shadow: 0 0 20px rgba(255, 215, 0, 0.8),
+                            0 0 40px rgba(255, 215, 0, 0.4);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        /* レリック効果ポップアップ */
+        .relic-effect-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(50, 40, 30, 0.95);
+            color: #fff;
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5),
+                        0 0 20px rgba(255, 215, 0, 0.3);
+            z-index: 1700;
+            text-align: center;
+            animation: relic-popup-animation 1.5s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes relic-popup-animation {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            20% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+            80% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -60%) scale(0.9);
+            }
+        }
+
+        .relic-effect-icon {
+            display: block;
+            font-size: 36px;
+            margin-bottom: 8px;
+        }
+
+        .relic-effect-name {
+            display: block;
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 5px;
+        }
+
+        .relic-effect-bonus {
+            display: block;
+            font-size: 24px;
+            font-weight: bold;
+            color: #66bb6a;
+        }
+
+        @media (max-width: 480px) {
+            .relic-effect-popup {
+                padding: 15px 25px;
+            }
+
+            .relic-effect-icon {
+                font-size: 28px;
+            }
+
+            .relic-effect-name {
+                font-size: 16px;
+            }
+
+            .relic-effect-bonus {
+                font-size: 20px;
+            }
+        }
+
         #settings-icon {
             position: fixed;
             top: 10px;
@@ -97,6 +343,31 @@
         }
 
         #settings-icon:active {
+            transform: scale(0.95);
+        }
+
+        #deck-button {
+            position: fixed;
+            top: 10px;
+            right: 60px;
+            background: rgba(62, 39, 35, 0.7);
+            color: #fff;
+            font-size: 24px;
+            padding: 8px 12px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        #deck-button:hover {
+            background: rgba(62, 39, 35, 0.9);
+            transform: scale(1.1);
+        }
+
+        #deck-button:active {
             transform: scale(0.95);
         }
 
@@ -155,6 +426,42 @@
         #restart-button:active {
             transform: translateY(0);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        #block-select-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        #block-select-content {
+            background: linear-gradient(135deg, #8d6e63 0%, #795548 100%);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            color: #fff;
+            max-width: 90%;
+        }
+
+        #block-select-content h2 {
+            font-size: 28px;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        #block-select-blocks {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
         }
 
         #shop-screen {
@@ -223,6 +530,72 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
+        #shop-gold-display {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffb300 100%);
+            color: #5d4037;
+            border-radius: 10px;
+            display: inline-block;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        #shop-content h3 {
+            font-size: 18px;
+            margin: 25px 0 15px 0;
+            color: #d7ccc8;
+        }
+
+        #shop-items {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+
+        .shop-item-slot {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #5d4037 0%, #4e342e 100%);
+            border: 2px dashed #8d6e63;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8d6e63;
+            font-size: 20px;
+        }
+
+        .shop-item-slot.empty {
+            opacity: 0.6;
+        }
+
+        #shop-next-button {
+            margin-top: 20px;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        #shop-next-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        #shop-next-button:active {
+            transform: scale(1.0);
+        }
+
         @media (max-width: 480px) {
             #shop-content {
                 padding: 30px 20px;
@@ -264,6 +637,147 @@
 
             .shop-block {
                 padding: 10px;
+            }
+        }
+
+        #deck-view-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        #deck-view-content {
+            background: linear-gradient(135deg, #8d6e63 0%, #795548 100%);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            color: #fff;
+            max-width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        #deck-view-content h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        #deck-view-content h3 {
+            font-size: 18px;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            color: #ccc;
+        }
+
+        #deck-blocks, #used-blocks {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        .deck-view-block {
+            display: grid;
+            gap: 2px;
+            padding: 8px;
+            background: linear-gradient(135deg, #6d4c41 0%, #5d4037 100%);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .deck-view-block.used {
+            opacity: 0.5;
+        }
+
+        .deck-view-block-cell {
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, #8d6e63 0%, #795548 100%);
+            border: 1px solid #6d4c41;
+            border-radius: 2px;
+        }
+
+        #deck-view-close {
+            background: linear-gradient(135deg, #6d4c41 0%, #5d4037 100%);
+            color: #fff;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        #deck-view-close:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        #deck-view-close:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        @media (max-width: 480px) {
+            #deck-view-content {
+                padding: 20px;
+            }
+
+            #deck-view-content h2 {
+                font-size: 20px;
+            }
+
+            #deck-blocks, #used-blocks {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .deck-view-block-cell {
+                width: 16px;
+                height: 16px;
+            }
+
+            .deck-view-block {
+                padding: 6px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            #deck-view-content {
+                padding: 15px;
+            }
+
+            #deck-view-content h2 {
+                font-size: 18px;
+            }
+
+            #deck-blocks, #used-blocks {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .deck-view-block-cell {
+                width: 14px;
+                height: 14px;
+            }
+
+            .deck-view-block {
+                padding: 5px;
             }
         }
 
@@ -506,6 +1020,47 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
+        /* パターン付きブロック */
+        .has-pattern {
+            position: relative;
+            box-shadow: 0 0 10px var(--pattern-color, #ff6b6b),
+                        0 0 20px var(--pattern-color, #ff6b6b);
+        }
+
+        .has-pattern::after {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            border: 2px solid var(--pattern-color, #ff6b6b);
+            border-radius: 6px;
+            pointer-events: none;
+            animation: pattern-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pattern-pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        /* シール付きセル */
+        .has-seal {
+            position: relative;
+        }
+
+        .seal-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 16px;
+            pointer-events: none;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+            z-index: 1;
+        }
+
         .drag-preview {
             position: fixed;
             pointer-events: none;
@@ -554,6 +1109,15 @@
                 padding: 15px;
                 min-height: 100px;
             }
+
+            #gold-display {
+                font-size: 16px;
+                padding: 8px 16px;
+            }
+
+            .gold-popup {
+                font-size: 36px;
+            }
         }
 
         @media (max-width: 380px) {
@@ -589,14 +1153,39 @@
                 padding: 12px;
                 min-height: 90px;
             }
+
+            #gold-display {
+                font-size: 14px;
+                padding: 6px 12px;
+            }
+
+            .gold-popup {
+                font-size: 28px;
+            }
         }
     </style>
 </head>
 <body>
     <div id="version-display"></div>
+    <div id="deck-button">📦</div>
     <div id="settings-icon">⚙️</div>
+
+    <!-- レリックパネル -->
+    <div id="relic-panel">
+        <div id="relic-panel-header">レリック</div>
+        <div id="relic-list"></div>
+    </div>
+
+    <!-- レリックツールチップ -->
+    <div id="relic-tooltip">
+        <div id="relic-tooltip-name"></div>
+        <div id="relic-tooltip-desc"></div>
+        <div id="relic-tooltip-rarity"></div>
+    </div>
+
     <h1>Woody Puzzle</h1>
     <div id="highscore-display">最高ラウンド: 1</div>
+    <div id="gold-display">0 G</div>
     <div id="score-display">スコア: 0</div>
     <div id="target-score-display">目標スコア: 20</div>
     <div id="deck-info">ラウンド 1 - 残りブロック: 9/9</div>
@@ -619,10 +1208,40 @@
         </div>
     </div>
 
+    <div id="block-select-screen" style="display: none;">
+        <div id="block-select-content">
+            <h2>ブロックを1つ選んでください</h2>
+            <div id="block-select-blocks"></div>
+        </div>
+    </div>
+
     <div id="shop-screen" style="display: none;">
         <div id="shop-content">
-            <h2>ブロックを1つ選んでください</h2>
-            <div id="shop-blocks"></div>
+            <h2>ショップ</h2>
+            <div id="shop-gold-display">所持金: 0 G</div>
+
+            <h3>アイテム</h3>
+            <div id="shop-items">
+                <div class="shop-item-slot empty">-</div>
+                <div class="shop-item-slot empty">-</div>
+                <div class="shop-item-slot empty">-</div>
+                <div class="shop-item-slot empty">-</div>
+                <div class="shop-item-slot empty">-</div>
+            </div>
+
+            <button id="shop-next-button">次のステップへ進む</button>
+        </div>
+    </div>
+
+    <div id="deck-view-screen" style="display: none;">
+        <div id="deck-view-content">
+            <h2>山札</h2>
+            <div id="deck-blocks"></div>
+            <div id="used-blocks-section">
+                <h3>使用中</h3>
+                <div id="used-blocks"></div>
+            </div>
+            <button id="deck-view-close">閉じる</button>
         </div>
     </div>
 
@@ -633,17 +1252,22 @@
          4. deck.js           - デッキ管理
          5. ui.js             - UI管理（スコア、ハイスコア、ゲームオーバー画面）
          6. shop.js           - ショップ管理（ブロック選択、デッキ追加）
-         7. board.js          - ボード管理（5x5グリッド、配置チェック、ライン消去）
-         8. block.js          - ブロック管理（ゲームロジック）
-         9. input.js          - 入力処理（ドラッグ&ドロップ）
-        10. main.js           - メイン処理（初期化、ゲームループ）
+         7. deck-view.js      - デッキ一覧表示
+         8. board.js          - ボード管理（5x5グリッド、配置チェック、ライン消去）
+         9. block.js          - ブロック管理（ゲームロジック）
+        10. input.js          - 入力処理（ドラッグ&ドロップ）
+        11. main.js           - メイン処理（初期化、ゲームループ）
     -->
     <script src="js/config.js"></script>
     <script src="js/shapes.js"></script>
+    <script src="js/patterns.js"></script>
     <script src="js/block-renderer.js"></script>
     <script src="js/deck.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/shop.js"></script>
+    <script src="js/block-select.js"></script>
+    <script src="js/deck-view.js"></script>
+    <script src="js/relics.js"></script>
     <script src="js/board.js"></script>
     <script src="js/block.js"></script>
     <script src="js/input.js"></script>

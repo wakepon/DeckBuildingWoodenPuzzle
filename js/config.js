@@ -34,5 +34,15 @@ var CONFIG = {
         SHOP_DEFAULT: 35,   // ショップ用
         SHOP_MEDIUM: 28,    // ショップ用（480px以下）
         SHOP_SMALL: 25      // ショップ用（380px以下）
-    }
+    },
+
+    // ゴールド関連の設定
+    GOLD: {
+        ROUND_CLEAR_REWARD: 50,     // ラウンドクリア報酬
+        ANIMATION_DURATION: 800,    // アニメーション時間(ms)
+        STORAGE_KEY: 'woodyPuzzleGold'  // localStorageのキー
+    },
+
+    // ゲーム状態保存用のキー
+    GAME_STATE_STORAGE_KEY: 'woodyPuzzleGameState'
 };
