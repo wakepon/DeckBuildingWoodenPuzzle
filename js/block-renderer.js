@@ -9,6 +9,8 @@ var BlockRenderer = {
     //   cellSize: セルサイズ(px)（省略時はCONFIG.CELL_SIZE.DEFAULT）,
     //   className: ブロック要素のクラス名（省略時は'block'）,
     //   cellClassName: セル要素のクラス名（省略時は'block-cell'）,
+    //   pattern: パターンID（省略可）,
+    //   seals: シール配列（省略可）,
     //   onClick: クリックイベントハンドラ（省略可）,
     //   onMouseDown: マウスダウンイベントハンドラ（省略可）,
     //   onTouchStart: タッチスタートイベントハンドラ（省略可）,
@@ -21,6 +23,16 @@ var BlockRenderer = {
         // ブロックIDを設定（省略可能）
         if (options.blockId) {
             blockDiv.dataset.blockId = options.blockId;
+        }
+
+        // パターン処理
+        if (options.pattern) {
+            const patternInfo = PatternManager.getPattern(options.pattern);
+            if (patternInfo) {
+                blockDiv.classList.add('has-pattern');
+                blockDiv.style.setProperty('--pattern-color', patternInfo.color);
+                blockDiv.dataset.pattern = options.pattern;
+            }
         }
 
         // ブロックの形状サイズを取得
@@ -46,6 +58,21 @@ var BlockRenderer = {
                 // 形状配列の値に応じて表示/非表示を制御
                 if (!options.shape[row][col]) {
                     cellDiv.style.visibility = 'hidden';
+                } else {
+                    // シール処理（表示されるセルのみ）
+                    if (options.seals && options.seals[row] && options.seals[row][col]) {
+                        const sealInfo = PatternManager.getSeal(options.seals[row][col]);
+                        if (sealInfo) {
+                            cellDiv.classList.add('has-seal');
+                            cellDiv.dataset.seal = options.seals[row][col];
+
+                            // シールアイコンを追加
+                            const sealIcon = document.createElement('span');
+                            sealIcon.className = 'seal-icon';
+                            sealIcon.textContent = sealInfo.icon;
+                            cellDiv.appendChild(sealIcon);
+                        }
+                    }
                 }
 
                 blockDiv.appendChild(cellDiv);

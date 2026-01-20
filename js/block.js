@@ -42,6 +42,8 @@ var BlockManager = {
                     cellSize: CONFIG.CELL_SIZE.DEFAULT,
                     className: 'block',
                     cellClassName: 'block-cell',
+                    pattern: block.pattern,
+                    seals: block.seals,
                     onMouseDown: (e) => InputHandler.startDrag(e, block),
                     onTouchStart: (e) => {
                         e.preventDefault();
@@ -113,6 +115,9 @@ var BlockManager = {
             return;
         }
 
+        // ブロックのセル数を計算（レリック効果判定用）
+        var placedBlockSize = BlockShapes.getSize(block.shape);
+
         GameBoard.place(row, col, block.shape);
 
         block.placed = true;
@@ -123,39 +128,48 @@ var BlockManager = {
         // UI更新
         GameUI.updatePlacementInfo(this.gameState.blocksPlacedCount, this.gameState.round);
 
+        // ゲーム状態を保存
+        GameUI.saveGameState();
+
         // 行・列のクリアチェック（スコアアニメーション完了後にコールバックが呼ばれる）
-        GameBoard.checkAndClearLines(() => {
+        // placedBlockSizeをレリック効果判定用に渡す
+        var self = this;
+        GameBoard.checkAndClearLines(function() {
             // スコアアニメーション完了後に実行される処理
 
             // 目標スコアに達成したかチェック
-            const targetScore = this.gameState.round * CONFIG.GAME.TARGET_SCORE_MULTIPLIER;
-            if (this.gameState.score >= targetScore) {
+            var targetScore = self.gameState.round * CONFIG.GAME.TARGET_SCORE_MULTIPLIER;
+            if (self.gameState.score >= targetScore) {
                 // 目標達成！ラウンド終了
-                this.gameState.roundEnding = true;
-                GameUI.showRoundEnd(this.gameState.round);
+                self.gameState.roundEnding = true;
+                GameUI.showRoundEnd(self.gameState.round);
                 return;
             }
 
             // 最大配置数に達したかチェック
-            if (this.gameState.blocksPlacedCount >= CONFIG.GAME.MAX_PLACEMENTS_PER_ROUND) {
+            if (self.gameState.blocksPlacedCount >= CONFIG.GAME.MAX_PLACEMENTS_PER_ROUND) {
                 // ラウンド終了
-                this.gameState.roundEnding = true;
-                GameUI.showRoundEnd(this.gameState.round);
+                self.gameState.roundEnding = true;
+                GameUI.showRoundEnd(self.gameState.round);
                 return;
             }
 
             // 3つすべて配置したかチェック
-            const allPlaced = this.gameState.currentBlocks.every(b => b.placed);
+            var allPlaced = self.gameState.currentBlocks.every(function(b) { return b.placed; });
             if (allPlaced) {
                 // 次の3つを引く（デッキが尽きても自動的に再シャッフルされる）
-                this.gameState.currentBlocks = DeckManager.draw(CONFIG.GAME.DRAW_COUNT);
-                this.render();
-                this.checkGameOver();
+                self.gameState.currentBlocks = DeckManager.draw(CONFIG.GAME.DRAW_COUNT);
+                self.render();
+                // ゲーム状態を保存
+                GameUI.saveGameState();
+                self.checkGameOver();
             } else {
+                // ゲーム状態を保存（スコア更新後）
+                GameUI.saveGameState();
                 // ゲームオーバーチェック
-                this.checkGameOver();
+                self.checkGameOver();
             }
-        });
+        }, placedBlockSize);
     },
 
     // 次のラウンドを開始
@@ -175,6 +189,8 @@ var BlockManager = {
         this.render();
         GameUI.updatePlacementInfo(this.gameState.blocksPlacedCount, this.gameState.round);
         GameUI.updateTargetScore(this.gameState.round);
+        // ゲーム状態を保存
+        GameUI.saveGameState();
         this.checkGameOver();
     },
 
