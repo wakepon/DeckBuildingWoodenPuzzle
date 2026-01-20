@@ -1,58 +1,65 @@
 // pattern-effects.js - パターン効果の計算ロジック
 
 var PatternEffects = {
-    // パターン効果によるボーナススコアを計算
+    // パターン効果を計算（新方式: 乗算対象のブロック数に加算）
     // cellsToAnimate: クリアされるセルの配列 [{row, col, ...}]
-    calculateBonus: function(cellsToAnimate) {
-        var totalBonus = 0;
-        var effects = [];
+    calculateEffects: function(cellsToAnimate) {
+        var baseBlocks = cellsToAnimate.length;
+        var auraBonus = 0;
+        var mossBonus = 0;
+        var enhancedBonus = 0;
         var self = this;
 
         cellsToAnimate.forEach(function(cellData) {
             var cellInfo = GameBoard.board[cellData.row][cellData.col];
             if (!cellInfo || !cellInfo.filled) return;
 
-            // 強化 (enhanced): +2点/ブロック
-            if (cellInfo.pattern === 'enhanced') {
-                totalBonus += 2;
-                effects.push({
-                    type: 'enhanced',
-                    row: cellData.row,
-                    col: cellData.col,
-                    bonus: 2
-                });
+            // オーラ効果: 隣接するオーラブロック（別セット）があるか
+            if (self.isAdjacentToAura(cellData.row, cellData.col, cellInfo.blockSetId)) {
+                auraBonus++;
             }
 
-            // オーラバフ (aura_buff): +2点/ブロック
-            if (cellInfo.buffs && cellInfo.buffs.indexOf('aura_buff') !== -1) {
-                totalBonus += 2;
-                effects.push({
-                    type: 'aura_buff',
-                    row: cellData.row,
-                    col: cellData.col,
-                    bonus: 2
-                });
-            }
-
-            // 苔 (moss): 盤面端と接している辺の数だけ+1点
+            // 苔効果: 端と接している辺の数
             if (cellInfo.pattern === 'moss') {
-                var edgeCount = self.countEdges(cellData.row, cellData.col);
-                if (edgeCount > 0) {
-                    totalBonus += edgeCount;
-                    effects.push({
-                        type: 'moss',
-                        row: cellData.row,
-                        col: cellData.col,
-                        bonus: edgeCount
-                    });
-                }
+                mossBonus += self.countEdges(cellData.row, cellData.col);
+            }
+
+            // 強化効果: +2点/ブロック（従来通り加算）
+            if (cellInfo.pattern === 'enhanced') {
+                enhancedBonus += 2;
             }
         });
 
         return {
-            totalBonus: totalBonus,
-            effects: effects
+            baseBlocks: baseBlocks,
+            auraBonus: auraBonus,
+            mossBonus: mossBonus,
+            enhancedBonus: enhancedBonus,
+            totalBlocks: baseBlocks + auraBonus + mossBonus
         };
+    },
+
+    // 隣接するオーラブロック（別セット）があるかチェック
+    isAdjacentToAura: function(row, col, myBlockSetId) {
+        var directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+        for (var i = 0; i < directions.length; i++) {
+            var adjRow = row + directions[i][0];
+            var adjCol = col + directions[i][1];
+
+            // ボードの範囲外チェック
+            if (adjRow < 0 || adjRow >= CONFIG.BOARD_SIZE ||
+                adjCol < 0 || adjCol >= CONFIG.BOARD_SIZE) {
+                continue;
+            }
+
+            var adjCell = GameBoard.board[adjRow][adjCol];
+            if (adjCell && adjCell.filled &&
+                adjCell.pattern === 'aura' &&
+                adjCell.blockSetId !== myBlockSetId) {
+                return true;
+            }
+        }
+        return false;
     },
 
     // 苔効果: 盤面端と接している辺をカウント
@@ -65,52 +72,15 @@ var PatternEffects = {
         return count;
     },
 
-    // パターン効果をグループ化（同じパターンは合算）
-    groupEffects: function(effects) {
-        var grouped = {};
-        effects.forEach(function(effect) {
-            if (!grouped[effect.type]) {
-                grouped[effect.type] = {
-                    type: effect.type,
-                    bonus: 0,
-                    count: 0
-                };
-            }
-            grouped[effect.type].bonus += effect.bonus;
-            grouped[effect.type].count++;
-        });
-
-        var result = [];
-        for (var type in grouped) {
-            result.push(grouped[type]);
-        }
-        return result;
-    },
-
-    // パターン効果発動時の視覚演出
+    // パターン効果発動時の視覚演出（強化用）
     showPatternEffect: function(effectType, bonus) {
-        var pattern = null;
-        var name = '';
-        var icon = '';
-
-        // パターンまたはバフの情報を取得
-        if (effectType === 'aura_buff') {
-            name = 'オーラバフ';
-            icon = '✨';
-        } else {
-            pattern = PatternManager.getPattern(effectType);
-            if (pattern) {
-                name = pattern.name;
-                icon = pattern.icon;
-            }
-        }
-
-        if (!name) return;
+        var pattern = PatternManager.getPattern(effectType);
+        if (!pattern) return;
 
         var popup = document.createElement('div');
         popup.className = 'pattern-effect-popup';
-        popup.innerHTML = '<span class="pattern-effect-icon">' + icon + '</span>' +
-                         '<span class="pattern-effect-name">' + name + '</span>' +
+        popup.innerHTML = '<span class="pattern-effect-icon">' + pattern.icon + '</span>' +
+                         '<span class="pattern-effect-name">' + pattern.name + '</span>' +
                          '<span class="pattern-effect-bonus">+' + bonus + '</span>';
         document.body.appendChild(popup);
 
@@ -121,30 +91,29 @@ var PatternEffects = {
         }, 1500);
     },
 
-    // 複数のパターン効果を順次表示
-    showAllEffects: function(effects, onComplete) {
-        var grouped = this.groupEffects(effects);
-        var self = this;
-        var index = 0;
+    // シール効果を計算
+    calculateSealEffects: function(cellsToAnimate) {
+        var goldCount = 0;
+        var scoreBonus = 0;
 
-        function showNext() {
-            if (index >= grouped.length) {
-                if (onComplete) onComplete();
-                return;
+        cellsToAnimate.forEach(function(cellData) {
+            var cellInfo = GameBoard.board[cellData.row][cellData.col];
+            if (!cellInfo || !cellInfo.filled || !cellInfo.seal) return;
+
+            // ゴールドシール
+            if (cellInfo.seal === 'gold') {
+                goldCount++;
             }
 
-            var effect = grouped[index];
-            self.showPatternEffect(effect.type, effect.bonus);
-            index++;
+            // スコアシール
+            if (cellInfo.seal === 'score') {
+                scoreBonus += 5;
+            }
+        });
 
-            // 次の効果を少し遅らせて表示
-            setTimeout(showNext, 800);
-        }
-
-        if (grouped.length > 0) {
-            showNext();
-        } else if (onComplete) {
-            onComplete();
-        }
+        return {
+            goldCount: goldCount,
+            scoreBonus: scoreBonus
+        };
     }
 };

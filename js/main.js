@@ -11,7 +11,9 @@ function initGame() {
     if (savedState && !savedState.gameState.roundEnding) {
         // 状態を復元
         BlockManager.gameState = savedState.gameState;
-        GameBoard.setBoard(savedState.board);
+        // 古い形式のボードデータを新形式に変換
+        var boardData = GameBoard.convertLegacyBoard(savedState.board);
+        GameBoard.setBoard(boardData);
         DeckManager.setState(savedState.deckState);
         if (savedState.relicState) {
             RelicManager.setState(savedState.relicState);

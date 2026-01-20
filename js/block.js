@@ -118,7 +118,8 @@ var BlockManager = {
         // ブロックのセル数を計算（レリック効果判定用）
         var placedBlockSize = BlockShapes.getSize(block.shape);
 
-        GameBoard.place(row, col, block.shape);
+        // パターンとシール情報、ブロックセットIDを渡して配置
+        GameBoard.place(row, col, block.shape, block.pattern, block.seals, block.id);
 
         block.placed = true;
         // 配置カウントを増やす

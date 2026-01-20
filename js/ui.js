@@ -48,29 +48,103 @@ var GameUI = {
         }, 600);
     },
 
-    // スコア計算演出を表示
+    // スコア計算演出を表示（レガシー用）
     showScoreCalculation: function(totalBlocks, totalLines, scoreAmount, callback) {
-        const display = document.getElementById('score-effect-display');
+        var self = this;
+        var display = document.getElementById('score-effect-display');
         if (!display) {
-            // displayが存在しない場合でも、スコアは加算してコールバックを呼ぶ
             this.animateScoreIncrement(scoreAmount, callback);
             return;
         }
 
-        // 第1段階: ブロック数 × ライン数
-        display.innerHTML = `${totalBlocks}<br>×<br>${totalLines}ライン`;
+        display.innerHTML = totalBlocks + '<br>×<br>' + totalLines + 'ライン';
         display.classList.add('show');
 
-        // 1秒後に第2段階: 計算結果とスコアインクリメント
-        setTimeout(() => {
-            display.innerHTML = `${scoreAmount}`;
-            this.animateScoreIncrement(scoreAmount, callback);
+        setTimeout(function() {
+            display.innerHTML = '' + scoreAmount;
+            self.animateScoreIncrement(scoreAmount, callback);
         }, 1000);
 
-        // さらに1秒後に非表示
-        setTimeout(() => {
+        setTimeout(function() {
             display.classList.remove('show');
         }, 2000);
+    },
+
+    // パターン効果付きスコア計算演出（段階的表示）
+    showPatternScoreCalculation: function(baseBlocks, totalLines, auraBonus, mossBonus, chainMasterActive, callback) {
+        var self = this;
+        var display = document.getElementById('score-effect-display');
+        if (!display) {
+            var totalBlocks = baseBlocks + auraBonus + mossBonus;
+            var finalScore = totalBlocks * totalLines;
+            if (chainMasterActive) {
+                finalScore = Math.floor(finalScore * 1.5);
+            }
+            this.animateScoreIncrement(finalScore, callback);
+            return;
+        }
+
+        var currentTotal = baseBlocks;
+
+        // 第1段階: 基本ブロック数を表示
+        display.innerHTML = baseBlocks + '<br>×<br>' + totalLines + 'ライン';
+        display.classList.add('show');
+
+        setTimeout(function() {
+            // 第2段階: オーラボーナス加算
+            if (auraBonus > 0) {
+                self.showBonusAddition(display, currentTotal, auraBonus, 'オーラ', '✨', function() {
+                    currentTotal += auraBonus;
+
+                    // 第3段階: 苔ボーナス加算
+                    if (mossBonus > 0) {
+                        self.showBonusAddition(display, currentTotal, mossBonus, '苔', '🌿', function() {
+                            currentTotal += mossBonus;
+                            self.showFinalScore(display, currentTotal, totalLines, chainMasterActive, callback);
+                        });
+                    } else {
+                        self.showFinalScore(display, currentTotal, totalLines, chainMasterActive, callback);
+                    }
+                });
+            } else if (mossBonus > 0) {
+                self.showBonusAddition(display, currentTotal, mossBonus, '苔', '🌿', function() {
+                    currentTotal += mossBonus;
+                    self.showFinalScore(display, currentTotal, totalLines, chainMasterActive, callback);
+                });
+            } else {
+                self.showFinalScore(display, currentTotal, totalLines, chainMasterActive, callback);
+            }
+        }, 1500);
+    },
+
+    // ボーナス加算アニメーション
+    showBonusAddition: function(display, current, bonus, name, icon, callback) {
+        display.innerHTML = current + ' +' + bonus + '<br>' + icon + ' ' + name;
+        setTimeout(callback, 1000);
+    },
+
+    // 最終スコア表示とスコア加算
+    showFinalScore: function(display, totalBlocks, totalLines, chainMasterActive, callback) {
+        var self = this;
+        var finalScore = totalBlocks * totalLines;
+
+        if (chainMasterActive) {
+            display.innerHTML = totalBlocks + ' × ' + totalLines + '<br>=<br>' + (totalBlocks * totalLines) + '<br>×1.5 連鎖の達人';
+            finalScore = Math.floor(finalScore * 1.5);
+            setTimeout(function() {
+                display.innerHTML = '=' + finalScore;
+                setTimeout(function() {
+                    self.animateScoreIncrement(finalScore, callback);
+                    display.classList.remove('show');
+                }, 800);
+            }, 1000);
+        } else {
+            display.innerHTML = totalBlocks + ' × ' + totalLines + '<br>=<br>' + finalScore;
+            setTimeout(function() {
+                self.animateScoreIncrement(finalScore, callback);
+                display.classList.remove('show');
+            }, 1200);
+        }
     },
 
     // スコアのインクリメントアニメーション
@@ -205,6 +279,24 @@ var GameUI = {
                 callback();
             }
         }, 3000);
+    },
+
+    // シール効果発動エフェクト
+    showSealEffect: function(sealId, text) {
+        var sealInfo = PatternManager.getSeal(sealId);
+        if (!sealInfo) return;
+
+        var popup = document.createElement('div');
+        popup.className = 'seal-effect-popup';
+        popup.innerHTML = '<span class="seal-effect-icon">' + sealInfo.icon + '</span>' +
+                         '<span class="seal-effect-text">' + text + '</span>';
+        document.body.appendChild(popup);
+
+        setTimeout(function() {
+            if (popup.parentNode) {
+                popup.parentNode.removeChild(popup);
+            }
+        }, 1500);
     },
 
     // ゴールドの読み込み
