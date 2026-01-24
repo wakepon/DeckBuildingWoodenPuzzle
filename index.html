@@ -428,42 +428,6 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
-        #block-select-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-        }
-
-        #block-select-content {
-            background: linear-gradient(135deg, #8d6e63 0%, #795548 100%);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-            text-align: center;
-            color: #fff;
-            max-width: 90%;
-        }
-
-        #block-select-content h2 {
-            font-size: 28px;
-            margin-bottom: 30px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        #block-select-blocks {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
         #shop-screen {
             position: fixed;
             top: 0;
@@ -548,29 +512,164 @@
             color: #d7ccc8;
         }
 
-        #shop-items {
+        /* ブロックセット商品コンテナ */
+        #shop-block-sets {
             display: flex;
             justify-content: center;
-            gap: 10px;
+            gap: 15px;
             flex-wrap: wrap;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
-        .shop-item-slot {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #5d4037 0%, #4e342e 100%);
-            border: 2px dashed #8d6e63;
-            border-radius: 10px;
+        /* レリック商品コンテナ */
+        #shop-relics {
             display: flex;
-            align-items: center;
             justify-content: center;
-            color: #8d6e63;
-            font-size: 20px;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
         }
 
-        .shop-item-slot.empty {
-            opacity: 0.6;
+        /* 商品カード共通スタイル */
+        .shop-product-card {
+            background: linear-gradient(135deg, #6d4c41 0%, #5d4037 100%);
+            border-radius: 12px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 100px;
+            max-width: 120px;
+            position: relative;
+        }
+
+        .shop-product-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+        }
+
+        .shop-product-card.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .shop-product-card.disabled:hover {
+            transform: none;
+        }
+
+        .shop-product-card.sold {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .shop-product-card.sold::after {
+            content: '購入済';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 14px;
+            font-weight: bold;
+            color: #66bb6a;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        /* 効果アイコン */
+        .shop-effect-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        /* 商品名 */
+        .shop-product-name {
+            font-size: 12px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 5px;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        /* ブロックプレビュー */
+        .shop-block-preview {
+            margin: 8px 0;
+        }
+
+        /* 商品説明 */
+        .shop-product-desc {
+            font-size: 10px;
+            color: #d7ccc8;
+            margin-bottom: 8px;
+            text-align: center;
+            line-height: 1.3;
+            min-height: 26px;
+        }
+
+        /* 価格表示 */
+        .shop-product-price {
+            font-size: 14px;
+            font-weight: bold;
+            color: #ffd700;
+            padding: 4px 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            margin-top: auto;
+        }
+
+        .shop-product-price.cannot-afford {
+            color: #ef5350;
+        }
+
+        /* レアリティ表示 */
+        .shop-product-rarity {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-bottom: 5px;
+        }
+
+        .shop-product-rarity.rarity-common {
+            background: #9e9e9e;
+            color: #fff;
+        }
+
+        .shop-product-rarity.rarity-rare {
+            background: #5fa8ff;
+            color: #fff;
+        }
+
+        .shop-product-rarity.rarity-epic {
+            background: #b46eff;
+            color: #fff;
+        }
+
+        /* レリックアイコン（ショップ用） */
+        .shop-relic-icon {
+            font-size: 32px;
+            margin: 8px 0;
+        }
+
+        /* 空メッセージ */
+        .shop-empty-message {
+            color: #8d6e63;
+            font-size: 14px;
+            padding: 20px;
+        }
+
+        /* 購入アニメーション */
+        @keyframes purchase-success {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); background: rgba(102, 187, 106, 0.3); }
+            100% { transform: scale(0.9); opacity: 0; }
+        }
+
+        .shop-product-card.purchasing {
+            animation: purchase-success 0.5s ease-out forwards;
         }
 
         #shop-next-button {
@@ -617,6 +716,24 @@
             .shop-block-cell {
                 width: 28px;
                 height: 28px;
+            }
+
+            #shop-block-sets,
+            #shop-relics {
+                gap: 10px;
+            }
+
+            .shop-product-card {
+                padding: 10px;
+                min-width: 90px;
+            }
+
+            .shop-product-name {
+                font-size: 11px;
+            }
+
+            .shop-product-desc {
+                font-size: 9px;
             }
         }
 
@@ -1404,26 +1521,16 @@
         </div>
     </div>
 
-    <div id="block-select-screen" style="display: none;">
-        <div id="block-select-content">
-            <h2>ブロックを1つ選んでください</h2>
-            <div id="block-select-blocks"></div>
-        </div>
-    </div>
-
     <div id="shop-screen" style="display: none;">
         <div id="shop-content">
             <h2>ショップ</h2>
             <div id="shop-gold-display">所持金: 0 G</div>
 
-            <h3>アイテム</h3>
-            <div id="shop-items">
-                <div class="shop-item-slot empty">-</div>
-                <div class="shop-item-slot empty">-</div>
-                <div class="shop-item-slot empty">-</div>
-                <div class="shop-item-slot empty">-</div>
-                <div class="shop-item-slot empty">-</div>
-            </div>
+            <h3>ブロックセット</h3>
+            <div id="shop-block-sets"></div>
+
+            <h3>レリック</h3>
+            <div id="shop-relics"></div>
 
             <button id="shop-next-button">次のステップへ進む</button>
         </div>
@@ -1461,7 +1568,6 @@
     <script src="js/deck.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/shop.js"></script>
-    <script src="js/block-select.js"></script>
     <script src="js/deck-view.js"></script>
     <script src="js/relics.js"></script>
     <script src="js/pattern-effects.js"></script>

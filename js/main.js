@@ -71,7 +71,6 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('restart-button').addEventListener('click', restartGame);
     GameUI.initSettingsIcon();
     DeckView.init();
-    BlockSelect.init();
     Shop.init();
     RelicManager.init();
 });
