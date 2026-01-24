@@ -237,7 +237,7 @@ var GameUI = {
                 deckInfoElement.style.color = '#fff';
                 deckInfoElement.style.fontWeight = 'bold';
 
-                // 3秒後にブロック選択画面を表示
+                // 3秒後にショップ画面を表示
                 setTimeout(() => {
                     // UI リセット
                     deckInfoElement.style.background = '';
@@ -247,8 +247,8 @@ var GameUI = {
                     // ラウンド終了フラグをリセット
                     BlockManager.gameState.roundEnding = false;
 
-                    // ブロック選択画面を表示
-                    BlockSelect.show();
+                    // ショップ画面を表示
+                    Shop.show();
                 }, 3000);
             } else {
                 // 目標未達成 → ゲームオーバー

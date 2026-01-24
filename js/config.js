@@ -1,6 +1,6 @@
 // ゲーム設定
 var CONFIG = {
-    VERSION: 'v2026.01.21.0011',
+    VERSION: 'v2026.01.24.1806',
     // ボードのグリッドサイズ（NxN）
     BOARD_SIZE: 5,
     // タッチ操作時のドラッグオフセット(px)
@@ -41,6 +41,25 @@ var CONFIG = {
         ROUND_CLEAR_REWARD: 50,     // ラウンドクリア報酬
         ANIMATION_DURATION: 800,    // アニメーション時間(ms)
         STORAGE_KEY: 'woodyPuzzleGold'  // localStorageのキー
+    },
+
+    // ショップ関連の設定
+    SHOP: {
+        // ブロックセット価格帯
+        BLOCK_SET_PRICE: {
+            PATTERN: { MIN: 50, MAX: 150 },  // パターン付き
+            SEAL: { MIN: 25, MAX: 50 }       // シール付き
+        },
+        // 各カテゴリの表示数
+        DISPLAY_COUNT: {
+            BLOCK_SETS: 3,
+            RELICS: 3
+        },
+        // ブロックサイズ範囲
+        BLOCK_SIZE: {
+            MIN: 1,
+            MAX: 5
+        }
     },
 
     // ゲーム状態保存用のキー
