@@ -15,22 +15,28 @@ var DeckView = {
         // 山札のブロックを表示（サイズ順にソート）
         var deckBlocks = DeckManager.state.deck.slice();
         deckBlocks.sort(function(a, b) {
-            return BlockShapes.getSize(a) - BlockShapes.getSize(b);
+            // 従来形式（shape配列）と拡張形式（{shape, pattern, seals}）の両方に対応
+            var shapeA = a.shape || a;
+            var shapeB = b.shape || b;
+            return BlockShapes.getSize(shapeA) - BlockShapes.getSize(shapeB);
         });
 
-        deckBlocks.forEach(function(shape, index) {
-            var blockElement = DeckView.createBlockElement(shape, 'deck-block-' + index);
+        deckBlocks.forEach(function(item, index) {
+            var blockElement = DeckView.createBlockElement(item, 'deck-block-' + index);
             deckBlocksContainer.appendChild(blockElement);
         });
 
         // 使用中のブロックを計算（initialDeckにあるがdeckにないもの）
         var usedBlocks = this.getUsedBlocks();
         usedBlocks.sort(function(a, b) {
-            return BlockShapes.getSize(a) - BlockShapes.getSize(b);
+            // 従来形式（shape配列）と拡張形式（{shape, pattern, seals}）の両方に対応
+            var shapeA = a.shape || a;
+            var shapeB = b.shape || b;
+            return BlockShapes.getSize(shapeA) - BlockShapes.getSize(shapeB);
         });
 
-        usedBlocks.forEach(function(shape, index) {
-            var blockElement = DeckView.createBlockElement(shape, 'used-block-' + index);
+        usedBlocks.forEach(function(item, index) {
+            var blockElement = DeckView.createBlockElement(item, 'used-block-' + index);
             blockElement.classList.add('used');
             usedBlocksContainer.appendChild(blockElement);
         });
@@ -58,15 +64,15 @@ var DeckView = {
 
         // initialDeckの各ブロックについて、deckに何個あるかカウント
         var deckCounts = {};
-        deck.forEach(function(shape) {
-            var key = JSON.stringify(shape);
+        deck.forEach(function(item) {
+            var key = JSON.stringify(item);
             deckCounts[key] = (deckCounts[key] || 0) + 1;
         });
 
         // initialDeckから、deckにないブロックを抽出
         var initialCounts = {};
-        initialDeck.forEach(function(shape) {
-            var key = JSON.stringify(shape);
+        initialDeck.forEach(function(item) {
+            var key = JSON.stringify(item);
             initialCounts[key] = (initialCounts[key] || 0) + 1;
         });
 
@@ -77,9 +83,9 @@ var DeckView = {
             var usedCount = initialCount - deckCount;
 
             if (usedCount > 0) {
-                var shape = JSON.parse(key);
+                var item = JSON.parse(key);
                 for (var i = 0; i < usedCount; i++) {
-                    usedBlocks.push(shape);
+                    usedBlocks.push(item);
                 }
             }
         }
@@ -88,14 +94,31 @@ var DeckView = {
     },
 
     // ブロック要素を作成
-    createBlockElement: function(shape, blockId) {
+    // 従来形式（shape配列）と拡張形式（{shape, pattern, seals}）の両方に対応
+    createBlockElement: function(item, blockId) {
         var cellSize = BlockRenderer.getResponsiveCellSize(true);
+
+        // 拡張形式（オブジェクト）の場合
+        var shape, pattern, seals;
+        if (item.shape) {
+            shape = item.shape;
+            pattern = item.pattern || null;
+            seals = item.seals || null;
+        } else {
+            // 従来形式（shape配列のみ）の場合
+            shape = item;
+            pattern = null;
+            seals = null;
+        }
+
         return BlockRenderer.createBlockElement({
             shape: shape,
             blockId: blockId,
             cellSize: cellSize,
             className: 'deck-view-block',
-            cellClassName: 'deck-view-block-cell'
+            cellClassName: 'deck-view-block-cell',
+            pattern: pattern,
+            seals: seals
         });
     },
 
