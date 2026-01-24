@@ -43,6 +43,25 @@ var CONFIG = {
         STORAGE_KEY: 'woodyPuzzleGold'  // localStorageのキー
     },
 
+    // ショップ関連の設定
+    SHOP: {
+        // ブロックセット価格帯
+        BLOCK_SET_PRICE: {
+            PATTERN: { MIN: 50, MAX: 150 },  // パターン付き
+            SEAL: { MIN: 25, MAX: 50 }       // シール付き
+        },
+        // 各カテゴリの表示数
+        DISPLAY_COUNT: {
+            BLOCK_SETS: 3,
+            RELICS: 3
+        },
+        // ブロックサイズ範囲
+        BLOCK_SIZE: {
+            MIN: 1,
+            MAX: 5
+        }
+    },
+
     // ゲーム状態保存用のキー
     GAME_STATE_STORAGE_KEY: 'woodyPuzzleGameState'
 };
