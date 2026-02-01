@@ -73,4 +73,5 @@ document.addEventListener('DOMContentLoaded', function() {
     DeckView.init();
     Shop.init();
     RelicManager.init();
+    DebugManager.init();
 });
