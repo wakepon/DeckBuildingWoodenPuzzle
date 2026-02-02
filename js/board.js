@@ -105,7 +105,7 @@ var GameBoard = {
                     };
 
                     // DOM更新
-                    var cellElement = document.querySelector(
+                    var cellElement = document.getElementById('board').querySelector(
                         '[data-row="' + targetRow + '"][data-col="' + targetCol + '"]'
                     );
                     if (cellElement) {
@@ -163,7 +163,7 @@ var GameBoard = {
         for (var row = 0; row < CONFIG.BOARD_SIZE; row++) {
             for (var col = 0; col < CONFIG.BOARD_SIZE; col++) {
                 var cell = this.board[row][col];
-                var cellElement = document.querySelector(
+                var cellElement = document.getElementById('board').querySelector(
                     '[data-row="' + row + '"][data-col="' + col + '"]'
                 );
                 if (cell && cell.filled && cellElement) {
@@ -271,7 +271,7 @@ var GameBoard = {
         // 各セルにアニメーションを適用
         cellsToAnimate.forEach(function(cellData) {
             setTimeout(function() {
-                var cellElement = document.querySelector(
+                var cellElement = document.getElementById('board').querySelector(
                     '[data-row="' + cellData.row + '"][data-col="' + cellData.col + '"]'
                 );
                 if (cellElement) {
@@ -300,7 +300,7 @@ var GameBoard = {
             // ボードとDOM要素をクリア
             cellsToAnimate.forEach(function(cellData) {
                 self.board[cellData.row][cellData.col] = self.createEmptyCell();
-                var cellElement = document.querySelector(
+                var cellElement = document.getElementById('board').querySelector(
                     '[data-row="' + cellData.row + '"][data-col="' + cellData.col + '"]'
                 );
                 if (cellElement) {
@@ -424,7 +424,7 @@ var GameBoard = {
         // DOMを更新
         for (var row = 0; row < CONFIG.BOARD_SIZE; row++) {
             for (var col = 0; col < CONFIG.BOARD_SIZE; col++) {
-                var cell = document.querySelector('[data-row="' + row + '"][data-col="' + col + '"]');
+                var cell = document.getElementById('board').querySelector('[data-row="' + row + '"][data-col="' + col + '"]');
                 var cellData = this.board[row][col];
                 if (cell) {
                     cell.className = 'cell';

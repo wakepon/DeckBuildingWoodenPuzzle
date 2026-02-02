@@ -89,7 +89,7 @@ var InputHandler = {
                     const targetCol = col + c;
                     if (targetRow >= 0 && targetRow < CONFIG.BOARD_SIZE &&
                         targetCol >= 0 && targetCol < CONFIG.BOARD_SIZE) {
-                        const cellElement = document.querySelector(
+                        const cellElement = document.getElementById('board').querySelector(
                             `[data-row="${targetRow}"][data-col="${targetCol}"]`
                         );
                         if (cellElement) {
