@@ -1973,6 +1973,206 @@
             transform: scale(1.05);
         }
 
+        /* ラウンド進行画面 */
+        #round-progress-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        #round-progress-content {
+            background: linear-gradient(135deg, #8d6e63 0%, #795548 100%);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            color: #fff;
+            max-width: 90%;
+        }
+
+        #round-progress-content h2 {
+            font-size: 28px;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        #round-progress-cards {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .round-progress-card {
+            background: linear-gradient(135deg, #6d4c41 0%, #5d4037 100%);
+            border-radius: 12px;
+            padding: 20px 25px;
+            min-width: 100px;
+            border-left: 5px solid;
+            transition: all 0.3s;
+        }
+
+        .round-progress-card.type-normal {
+            border-left-color: #5fa8ff;
+        }
+
+        .round-progress-card.type-elite {
+            border-left-color: #b46eff;
+        }
+
+        .round-progress-card.type-boss {
+            border-left-color: #ef5350;
+        }
+
+        .round-progress-card.current {
+            border: 3px solid #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5),
+                        0 0 40px rgba(255, 215, 0, 0.3);
+            animation: round-card-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes round-card-glow {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(255, 215, 0, 0.5),
+                            0 0 40px rgba(255, 215, 0, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(255, 215, 0, 0.7),
+                            0 0 60px rgba(255, 215, 0, 0.4);
+            }
+        }
+
+        .round-progress-card.cleared {
+            opacity: 0.5;
+            filter: grayscale(0.5);
+        }
+
+        .round-progress-card.upcoming {
+            opacity: 0.9;
+        }
+
+        .round-card-type {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .round-progress-card.type-normal .round-card-type {
+            color: #5fa8ff;
+        }
+
+        .round-progress-card.type-elite .round-card-type {
+            color: #b46eff;
+        }
+
+        .round-progress-card.type-boss .round-card-type {
+            color: #ef5350;
+        }
+
+        .round-card-reward {
+            font-size: 18px;
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .round-card-status {
+            font-size: 12px;
+            margin-top: 8px;
+            color: #d7ccc8;
+        }
+
+        #round-progress-button {
+            margin-top: 10px;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        #round-progress-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        #round-progress-button:active {
+            transform: scale(1.0);
+        }
+
+        @media (max-width: 480px) {
+            #round-progress-content {
+                padding: 30px 20px;
+            }
+
+            #round-progress-content h2 {
+                font-size: 22px;
+                margin-bottom: 20px;
+            }
+
+            #round-progress-cards {
+                gap: 15px;
+            }
+
+            .round-progress-card {
+                padding: 15px 20px;
+                min-width: 85px;
+            }
+
+            .round-card-type {
+                font-size: 12px;
+            }
+
+            .round-card-reward {
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            #round-progress-content {
+                padding: 20px 15px;
+            }
+
+            #round-progress-content h2 {
+                font-size: 20px;
+                margin-bottom: 15px;
+            }
+
+            #round-progress-cards {
+                gap: 10px;
+            }
+
+            .round-progress-card {
+                padding: 12px 15px;
+                min-width: 75px;
+            }
+
+            .round-card-type {
+                font-size: 11px;
+            }
+
+            .round-card-reward {
+                font-size: 14px;
+            }
+
+            #round-progress-button {
+                padding: 12px 30px;
+                font-size: 16px;
+            }
+        }
+
         /* クイックアクションセクション */
         .debug-quick-actions {
             display: flex;
@@ -2011,6 +2211,30 @@
         .debug-action-btn.danger { background: #f44336; color: white; }
         .debug-action-btn.info { background: #2196f3; color: white; }
         .debug-action-btn.warning { background: #ff9800; color: white; }
+
+        /* ラウンドタイプラベル */
+        .round-type-label {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-right: 8px;
+        }
+
+        .round-type-label.type-normal {
+            background-color: #5fa8ff;
+            color: #fff;
+        }
+
+        .round-type-label.type-elite {
+            background-color: #b46eff;
+            color: #fff;
+        }
+
+        .round-type-label.type-boss {
+            background-color: #ef5350;
+            color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -2096,6 +2320,14 @@
         </div>
     </div>
 
+    <div id="round-progress-screen" style="display: none;">
+        <div id="round-progress-content">
+            <h2>セット <span id="round-progress-set-number">1</span></h2>
+            <div id="round-progress-cards"></div>
+            <button id="round-progress-button">ラウンドへ進む</button>
+        </div>
+    </div>
+
     <!-- JavaScriptファイルの読み込み順序
          1. config.js         - 設定（定数、バージョン番号など）
          2. shapes.js         - ブロック形状定義
@@ -2116,6 +2348,7 @@
     <script src="js/deck.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/shop.js"></script>
+    <script src="js/round-progress.js"></script>
     <script src="js/deck-view.js"></script>
     <script src="js/relics.js"></script>
     <script src="js/pattern-effects.js"></script>
