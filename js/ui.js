@@ -218,7 +218,10 @@ var GameUI = {
         const deckInfoElement = document.getElementById('deck-info');
         if (deckInfoElement) {
             const remaining = CONFIG.GAME.MAX_PLACEMENTS_PER_ROUND - blocksPlaced;
-            deckInfoElement.textContent = `ラウンド ${round} - 残り配置数: ${remaining}/${CONFIG.GAME.MAX_PLACEMENTS_PER_ROUND}`;
+            const roundInfo = RoundProgress.getRoundInfo(round);
+
+            // ラウンドタイプのスパンを作成
+            deckInfoElement.innerHTML = '<span class="round-type-label type-' + roundInfo.roundType + '">' + roundInfo.label + '</span> ラウンド ' + round + ' - 残り配置数: ' + remaining + '/' + CONFIG.GAME.MAX_PLACEMENTS_PER_ROUND;
         }
     },
 
@@ -247,8 +250,13 @@ var GameUI = {
                     // ラウンド終了フラグをリセット
                     BlockManager.gameState.roundEnding = false;
 
-                    // ショップ画面を表示
-                    Shop.show();
+                    // ラウンドタイプに基づく報酬を付与
+                    var reward = RoundProgress.getRewardForRound(round);
+                    GameUI.showGoldPopup(reward);
+                    GameUI.animateGoldIncrement(reward, function() {
+                        // アニメーション完了後にショップ画面を表示
+                        Shop.show();
+                    });
                 }, 3000);
             } else {
                 // 目標未達成 → ゲームオーバー

@@ -1,6 +1,6 @@
 // ゲーム設定
 var CONFIG = {
-    VERSION: 'v2026.02.02.1249',
+    VERSION: 'v2026.02.02.2250',
     // ボードのグリッドサイズ（NxN）
     BOARD_SIZE: 5,
     // タッチ操作時のドラッグオフセット(px)
@@ -38,7 +38,7 @@ var CONFIG = {
 
     // ゴールド関連の設定
     GOLD: {
-        ROUND_CLEAR_REWARD: 50,     // ラウンドクリア報酬
+        ROUND_CLEAR_REWARD: 5,     // ラウンドクリア報酬
         ANIMATION_DURATION: 800,    // アニメーション時間(ms)
         STORAGE_KEY: 'woodyPuzzleGold'  // localStorageのキー
     },
@@ -47,8 +47,8 @@ var CONFIG = {
     SHOP: {
         // ブロックセット価格帯
         BLOCK_SET_PRICE: {
-            PATTERN: { MIN: 50, MAX: 150 },  // パターン付き
-            SEAL: { MIN: 25, MAX: 50 }       // シール付き
+            PATTERN: { MIN: 1, MAX: 5 },  // パターン付き
+            SEAL: { MIN: 1, MAX: 2 }       // シール付き
         },
         // 各カテゴリの表示数
         DISPLAY_COUNT: {
@@ -63,5 +63,14 @@ var CONFIG = {
     },
 
     // ゲーム状態保存用のキー
-    GAME_STATE_STORAGE_KEY: 'woodyPuzzleGameState'
+    GAME_STATE_STORAGE_KEY: 'woodyPuzzleGameState',
+
+    // ラウンド進行設定
+    ROUND_PROGRESS: {
+        ROUNDS_PER_SET: 3,
+        TYPES: ['normal', 'elite', 'boss'],
+        LABELS: { normal: '雑魚', elite: 'エリート', boss: 'ボス' },
+        COLORS: { normal: '#5fa8ff', elite: '#b46eff', boss: '#ef5350' },
+        REWARDS: { normal: 5, elite: 7, boss: 10 }
+    }
 };

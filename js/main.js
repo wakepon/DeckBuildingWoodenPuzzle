@@ -72,6 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
     GameUI.initSettingsIcon();
     DeckView.init();
     Shop.init();
+    RoundProgress.init();
     RelicManager.init();
     DebugManager.init();
 });
