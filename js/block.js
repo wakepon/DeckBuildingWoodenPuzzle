@@ -5,7 +5,7 @@ var BlockManager = {
     // ゲームステート
     gameState: {
         currentBlocks: [],     // 現在の手札（3つ）
-        round: 1,              // 現在のラウンド
+        round: 0,              // 現在のラウンド（0から開始し、RoundProgress.showで1になる）
         score: 0,              // 現在のスコア
         blocksPlacedCount: 0,  // 現在のラウンドで配置したブロック数
         roundEnding: false,    // ラウンド終了処理中フラグ
@@ -177,14 +177,6 @@ var BlockManager = {
     // 次のラウンドを開始
     startNextRound: function() {
         this.gameState.round++;
-
-        // 次のラウンドのセット情報を取得
-        var nextRoundInfo = RoundProgress.getRoundInfo(this.gameState.round);
-
-        // 新しいセットに入った場合（positionInSet === 0）、ボス条件をリセット
-        if (nextRoundInfo.positionInSet === 0) {
-            this.gameState.bossCondition = null;
-        }
 
         // スコアをリセット
         GameUI.resetScore();
