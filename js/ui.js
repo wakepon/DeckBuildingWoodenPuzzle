@@ -221,7 +221,14 @@ var GameUI = {
             const roundInfo = RoundProgress.getRoundInfo(round);
 
             // ラウンドタイプのスパンを作成
-            deckInfoElement.innerHTML = '<span class="round-type-label type-' + roundInfo.roundType + '">' + roundInfo.label + '</span> ラウンド ' + round + ' - 残り配置数: ' + remaining + '/' + CONFIG.GAME.MAX_PLACEMENTS_PER_ROUND;
+            var html = '<span class="round-type-label type-' + roundInfo.roundType + '">' + roundInfo.label + '</span> ラウンド ' + round + ' - 残り配置数: ' + remaining + '/' + CONFIG.GAME.MAX_PLACEMENTS_PER_ROUND;
+
+            // ボスラウンドの場合、条件を表示
+            if (roundInfo.roundType === 'boss' && BlockManager.gameState.bossCondition) {
+                html += '<span class="boss-condition-game">' + BlockManager.gameState.bossCondition.icon + ' ' + BlockManager.gameState.bossCondition.name + '</span>';
+            }
+
+            deckInfoElement.innerHTML = html;
         }
     },
 

@@ -62,6 +62,13 @@ var RoundProgress = {
         return info.reward;
     },
 
+    // ボス条件をランダムに選択
+    selectBossCondition: function() {
+        var conditions = CONFIG.BOSS_CONDITIONS;
+        var index = Math.floor(Math.random() * conditions.length);
+        return conditions[index];
+    },
+
     // 進行画面を表示
     show: function() {
         var screen = document.getElementById('round-progress-screen');
@@ -70,6 +77,17 @@ var RoundProgress = {
 
         // セット番号を更新
         document.getElementById('round-progress-set-number').textContent = nextRoundInfo.setNumber;
+
+        // ボス条件の抽選
+        // 次のラウンドが新しいセットの最初（positionInSet === 0）の場合、新しい条件を抽選
+        // それ以外で、まだ条件が設定されていない場合も抽選
+        if (nextRoundInfo.positionInSet === 0) {
+            // 新しいセットに入る → 新しい条件を抽選
+            BlockManager.gameState.bossCondition = this.selectBossCondition();
+        } else if (!BlockManager.gameState.bossCondition) {
+            // 同じセット内で初めての表示 → 条件を抽選
+            BlockManager.gameState.bossCondition = this.selectBossCondition();
+        }
 
         // カードをレンダリング
         this.renderCards(nextRoundInfo);
@@ -129,6 +147,14 @@ var RoundProgress = {
                 statusEl.textContent = '';
             }
             card.appendChild(statusEl);
+
+            // ボスカードに条件を表示（未到達でも表示）
+            if (roundType === 'boss' && BlockManager.gameState.bossCondition) {
+                var conditionEl = document.createElement('div');
+                conditionEl.className = 'boss-condition-label';
+                conditionEl.textContent = BlockManager.gameState.bossCondition.icon + ' ' + BlockManager.gameState.bossCondition.name;
+                card.appendChild(conditionEl);
+            }
 
             container.appendChild(card);
         }
