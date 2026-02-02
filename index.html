@@ -1476,12 +1476,560 @@
                 font-size: 28px;
             }
         }
+
+        /* デバッグボタン */
+        #debug-button {
+            position: fixed;
+            top: 40px;
+            left: 10px;
+            background: rgba(62, 39, 35, 0.7);
+            color: #fff;
+            font-size: 20px;
+            padding: 6px 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        #debug-button:hover {
+            background: rgba(62, 39, 35, 0.9);
+            transform: scale(1.1);
+        }
+
+        #debug-button:active {
+            transform: scale(0.95);
+        }
+
+        /* デバッグモーダル */
+        #debug-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        #debug-content {
+            background: linear-gradient(135deg, #8d6e63 0%, #795548 100%);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            color: #fff;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #debug-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        #debug-header h2 {
+            font-size: 22px;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        #debug-close {
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #debug-close:hover {
+            background: rgba(239, 83, 80, 0.8);
+            transform: scale(1.1);
+        }
+
+        #debug-tabs {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .debug-tab {
+            background: linear-gradient(135deg, #6d4c41 0%, #5d4037 100%);
+            color: #d7ccc8;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .debug-tab:hover {
+            background: linear-gradient(135deg, #7d5c51 0%, #6d4c41 100%);
+            color: #fff;
+        }
+
+        .debug-tab.active {
+            background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(102, 187, 106, 0.4);
+        }
+
+        #debug-tab-content {
+            flex: 1;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            min-height: 200px;
+        }
+
+        .debug-placeholder {
+            color: #d7ccc8;
+            font-size: 16px;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        @media (max-width: 480px) {
+            #debug-content {
+                padding: 15px;
+                width: 95%;
+            }
+
+            #debug-header h2 {
+                font-size: 18px;
+            }
+
+            .debug-tab {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+
+            #debug-tab-content {
+                padding: 10px;
+                min-height: 150px;
+            }
+
+            .debug-placeholder {
+                font-size: 14px;
+                margin-top: 30px;
+            }
+        }
+
+        /* デバッグ - レリック管理タブ */
+        .debug-relics-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .debug-section {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .debug-section-title {
+            font-size: 14px;
+            color: #d7ccc8;
+            margin: 0 0 10px 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .debug-relic-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .debug-relic-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #6d4c41 0%, #5d4037 100%);
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .debug-relic-card.owned {
+            background: linear-gradient(135deg, #4a6741 0%, #3d5636 100%);
+        }
+
+        .debug-relic-icon {
+            font-size: 24px;
+            width: 36px;
+            text-align: center;
+        }
+
+        .debug-relic-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .debug-relic-name {
+            font-size: 13px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .debug-relic-rarity {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 8px;
+            display: inline-block;
+            width: fit-content;
+        }
+
+        .debug-relic-rarity.rarity-common { background: #9e9e9e; }
+        .debug-relic-rarity.rarity-rare { background: #5fa8ff; }
+        .debug-relic-rarity.rarity-epic { background: #b46eff; }
+
+        .debug-relic-desc {
+            font-size: 11px;
+            color: #bcaaa4;
+        }
+
+        .debug-relic-add, .debug-relic-remove {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .debug-relic-add {
+            background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+            color: #fff;
+        }
+
+        .debug-relic-add:hover {
+            transform: scale(1.05);
+        }
+
+        .debug-relic-remove {
+            background: linear-gradient(135deg, #ef5350 0%, #e53935 100%);
+            color: #fff;
+        }
+
+        .debug-relic-remove:hover {
+            transform: scale(1.05);
+        }
+
+        .debug-relic-owned-badge {
+            font-size: 11px;
+            padding: 4px 8px;
+            background: rgba(102, 187, 106, 0.3);
+            color: #66bb6a;
+            border-radius: 6px;
+        }
+
+        .debug-empty-message {
+            color: #8d6e63;
+            font-size: 13px;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* デバッグ - ゲーム状態タブ */
+        .debug-gamestate-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .debug-state-row {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 10px 12px;
+        }
+
+        .debug-state-label {
+            display: block;
+            font-size: 13px;
+            color: #d7ccc8;
+            margin-bottom: 8px;
+        }
+
+        .debug-state-controls {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            justify-content: center;
+        }
+
+        .debug-state-input {
+            width: 80px;
+            padding: 8px;
+            border: none;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #3e2723;
+            font-size: 14px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .debug-quick-btn {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 6px;
+            background: linear-gradient(135deg, #6d4c41 0%, #5d4037 100%);
+            color: #fff;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .debug-quick-btn:hover {
+            transform: scale(1.05);
+            background: linear-gradient(135deg, #7d5c51 0%, #6d4c41 100%);
+        }
+
+        .debug-state-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            justify-content: center;
+        }
+
+        .debug-action-btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .debug-action-btn.apply {
+            background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+            color: #fff;
+        }
+
+        .debug-action-btn.reset {
+            background: linear-gradient(135deg, #ff7043 0%, #f4511e 100%);
+            color: #fff;
+        }
+
+        .debug-action-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .debug-state-readonly {
+            background: rgba(255, 255, 255, 0.5);
+            cursor: not-allowed;
+        }
+
+        /* デバッグ - ブロックセットタブ */
+        .debug-blocksets-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .debug-shape-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+
+        .debug-shape-card {
+            background: linear-gradient(135deg, #6d4c41 0%, #5d4037 100%);
+            border-radius: 8px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .debug-shape-preview {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .debug-shape-add {
+            font-size: 10px;
+            padding: 4px 8px;
+            border: none;
+            border-radius: 4px;
+            background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .debug-shape-add:hover {
+            transform: scale(1.05);
+        }
+
+        .debug-hand-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .debug-hand-card {
+            background: linear-gradient(135deg, #6d4c41 0%, #5d4037 100%);
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .debug-hand-preview {
+            min-width: 60px;
+        }
+
+        .debug-hand-controls {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .debug-pattern-select {
+            padding: 6px;
+            border: none;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 12px;
+        }
+
+        .debug-seal-buttons {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .debug-seal-buttons button {
+            padding: 4px 8px;
+            border: none;
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.3);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .debug-seal-buttons button:hover {
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .debug-seal-buttons button.active {
+            background: rgba(255, 215, 0, 0.5);
+        }
+
+        .debug-hand-remove {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            background: linear-gradient(135deg, #ef5350 0%, #e53935 100%);
+            color: #fff;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .debug-hand-remove:hover {
+            transform: scale(1.05);
+        }
+
+        /* クイックアクションセクション */
+        .debug-quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 8px;
+            border-radius: 8px;
+        }
+
+        .debug-quick-actions h3 {
+            width: 100%;
+            margin: 0 0 8px 0;
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        .debug-quick-actions .debug-action-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            transition: opacity 0.2s;
+        }
+
+        .debug-quick-actions .debug-action-btn:hover {
+            opacity: 0.8;
+        }
+
+        /* ボタン色分け */
+        .debug-action-btn.success { background: #4caf50; color: white; }
+        .debug-action-btn.danger { background: #f44336; color: white; }
+        .debug-action-btn.info { background: #2196f3; color: white; }
+        .debug-action-btn.warning { background: #ff9800; color: white; }
     </style>
 </head>
 <body>
     <div id="version-display"></div>
     <div id="deck-button">📦</div>
+    <div id="debug-button">🔧</div>
     <div id="settings-icon">⚙️</div>
+
+    <!-- デバッグモーダル -->
+    <div id="debug-modal" style="display: none;">
+        <div id="debug-content">
+            <div id="debug-header">
+                <h2>🔧 デバッグ</h2>
+                <button id="debug-close">&times;</button>
+            </div>
+            <div id="debug-tabs"></div>
+            <div id="debug-tab-content"></div>
+        </div>
+    </div>
 
     <!-- レリックパネル -->
     <div id="relic-panel">
@@ -1574,6 +2122,7 @@
     <script src="js/board.js"></script>
     <script src="js/block.js"></script>
     <script src="js/input.js"></script>
+    <script src="js/debug.js"></script>
     <script src="js/main.js"></script>
     <script>
         // バージョン番号を表示
