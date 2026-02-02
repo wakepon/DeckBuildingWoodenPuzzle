@@ -8,7 +8,7 @@ var RelicManager = {
             name: '全消しボーナス',
             description: '盤面を全て空にするとスコア+20',
             rarity: 'common',
-            price: 100,
+            price: 4,
             icon: '✨'
         },
         SMALL_LUCK: {
@@ -16,7 +16,7 @@ var RelicManager = {
             name: '小さな幸運',
             description: '3ブロックのピースを配置した際に行または列が揃うとスコア+20',
             rarity: 'common',
-            price: 80,
+            price: 3,
             icon: '🍀'
         },
         CHAIN_MASTER: {
@@ -24,7 +24,7 @@ var RelicManager = {
             name: '連鎖の達人',
             description: '複数行列を同時消しするとスコア倍率を1.5倍',
             rarity: 'rare',
-            price: 200,
+            price: 7,
             icon: '⚡'
         }
     },

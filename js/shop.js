@@ -12,11 +12,6 @@ var Shop = {
     show: function() {
         var shopScreen = document.getElementById('shop-screen');
 
-        // ラウンドクリア報酬を付与
-        var reward = CONFIG.GOLD.ROUND_CLEAR_REWARD;
-        GameUI.showGoldPopup(reward);
-        GameUI.animateGoldIncrement(reward);
-
         // 商品を生成
         this.generateProducts();
 
@@ -417,6 +412,9 @@ var Shop = {
     hide: function() {
         var shopScreen = document.getElementById('shop-screen');
         shopScreen.style.display = 'none';
+
+        // メイン画面の所持G表示を更新
+        GameUI.updateGoldDisplay();
     },
 
     // 次のステップへ進む
@@ -424,8 +422,8 @@ var Shop = {
         // ショップを閉じる
         this.hide();
 
-        // 次のラウンド開始
-        BlockManager.startNextRound();
+        // ラウンド進行画面を表示
+        RoundProgress.show();
     },
 
     // イベントリスナーを初期化
