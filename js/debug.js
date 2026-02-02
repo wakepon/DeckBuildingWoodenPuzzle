@@ -10,8 +10,7 @@ var DebugManager = {
     TABS: {
         relics: { name: 'レリック', icon: '✨' },
         gameState: { name: 'ゲーム状態', icon: '📊' },
-        blockSets: { name: 'ブロックセット', icon: '🧱' },
-        handManagement: { name: '手札管理', icon: '🃏' }
+        blockSets: { name: 'ブロックセット', icon: '🧱' }
     },
 
     /**
@@ -91,6 +90,9 @@ var DebugManager = {
         var tabsContainer = document.getElementById('debug-tabs');
         if (!tabsContainer) return;
 
+        // クイックアクションをタブの前にレンダリング
+        this.renderQuickActions();
+
         tabsContainer.innerHTML = '';
 
         Object.keys(this.TABS).forEach(function(tabId) {
@@ -106,6 +108,75 @@ var DebugManager = {
             });
             tabsContainer.appendChild(tabButton);
         });
+    },
+
+    /**
+     * クイックアクションセクションをレンダリング
+     */
+    renderQuickActions: function() {
+        var self = this;
+        var tabsContainer = document.getElementById('debug-tabs');
+        if (!tabsContainer) return;
+
+        // 既存のクイックアクションを削除
+        var existingQuickActions = document.querySelector('.debug-quick-actions');
+        if (existingQuickActions) {
+            existingQuickActions.remove();
+        }
+
+        // クイックアクションセクションを作成
+        var quickActionsDiv = document.createElement('div');
+        quickActionsDiv.className = 'debug-quick-actions';
+
+        var title = document.createElement('h3');
+        title.textContent = 'クイックアクション';
+        quickActionsDiv.appendChild(title);
+
+        // 盤面クリアボタン
+        var boardClearBtn = document.createElement('button');
+        boardClearBtn.className = 'debug-action-btn danger';
+        boardClearBtn.textContent = '盤面クリア';
+        boardClearBtn.addEventListener('click', function() {
+            self.forceClearBoard();
+        });
+        quickActionsDiv.appendChild(boardClearBtn);
+
+        // 全レリック獲得ボタン
+        var allRelicsBtn = document.createElement('button');
+        allRelicsBtn.className = 'debug-action-btn info';
+        allRelicsBtn.textContent = '全レリック獲得';
+        allRelicsBtn.addEventListener('click', function() {
+            self.acquireAllRelics();
+        });
+        quickActionsDiv.appendChild(allRelicsBtn);
+
+        // タブコンテナの前に挿入
+        tabsContainer.parentNode.insertBefore(quickActionsDiv, tabsContainer);
+    },
+
+    /**
+     * 盤面を強制クリア
+     */
+    forceClearBoard: function() {
+        if (confirm('盤面上の全ブロックを削除しますか？')) {
+            GameBoard.clear();
+            GameUI.saveGameState();
+        }
+    },
+
+    /**
+     * 全レリックを獲得
+     */
+    acquireAllRelics: function() {
+        var allRelics = RelicManager.getAllRelics();
+        var self = this;
+        allRelics.forEach(function(relic) {
+            if (!RelicManager.hasRelic(relic.id)) {
+                RelicManager.addRelic(relic.id);
+            }
+        });
+        RelicManager.render();
+        this.renderRelicsTab();
     },
 
     /**
