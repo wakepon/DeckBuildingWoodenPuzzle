@@ -82,7 +82,8 @@ var RoundProgress = {
         // 次のラウンドが新しいセットの最初（positionInSet === 0）の場合、新しい条件を抽選
         // それ以外で、まだ条件が設定されていない場合も抽選
         if (nextRoundInfo.positionInSet === 0) {
-            // 新しいセットに入る → 新しい条件を抽選
+            // 新しいセットに入る → デバッグフラグをリセットして新しい条件を抽選
+            BlockManager.gameState.bossConditionOverridden = false;
             BlockManager.gameState.bossCondition = this.selectBossCondition();
         } else if (!BlockManager.gameState.bossCondition) {
             // 同じセット内で初めての表示 → 条件を抽選

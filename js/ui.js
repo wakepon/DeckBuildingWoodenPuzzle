@@ -217,11 +217,13 @@ var GameUI = {
     updatePlacementInfo: function(blocksPlaced, round) {
         const deckInfoElement = document.getElementById('deck-info');
         if (deckInfoElement) {
-            const remaining = CONFIG.GAME.MAX_PLACEMENTS_PER_ROUND - blocksPlaced;
+            // ボス条件を考慮した最大配置数を取得
+            const maxPlacements = BlockManager.getMaxPlacements();
+            const remaining = maxPlacements - blocksPlaced;
             const roundInfo = RoundProgress.getRoundInfo(round);
 
             // ラウンドタイプのスパンを作成
-            var html = '<span class="round-type-label type-' + roundInfo.roundType + '">' + roundInfo.label + '</span> ラウンド ' + round + ' - 残り配置数: ' + remaining + '/' + CONFIG.GAME.MAX_PLACEMENTS_PER_ROUND;
+            var html = '<span class="round-type-label type-' + roundInfo.roundType + '">' + roundInfo.label + '</span> ラウンド ' + round + ' - 残り配置数: ' + remaining + '/' + maxPlacements;
 
             // ボスラウンドの場合、条件を表示
             if (roundInfo.roundType === 'boss' && BlockManager.gameState.bossCondition) {
