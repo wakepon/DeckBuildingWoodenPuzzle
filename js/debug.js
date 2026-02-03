@@ -10,7 +10,8 @@ var DebugManager = {
     TABS: {
         relics: { name: 'レリック', icon: '✨' },
         gameState: { name: 'ゲーム状態', icon: '📊' },
-        blockSets: { name: 'ブロックセット', icon: '🧱' }
+        blockSets: { name: 'ブロックセット', icon: '🧱' },
+        round: { name: 'ラウンド', icon: '🎯' }
     },
 
     /**
@@ -195,6 +196,8 @@ var DebugManager = {
             this.renderGameStateTab();
         } else if (this.activeTab === 'blockSets') {
             this.renderBlockSetsTab();
+        } else if (this.activeTab === 'round') {
+            this.renderRoundTab();
         } else {
             contentContainer.innerHTML = '<p class="debug-placeholder">' + tab.icon + ' ' + tab.name + 'タブの内容</p>';
         }
@@ -800,5 +803,93 @@ var DebugManager = {
 
         BlockManager.render();
         this.renderBlockSetsTab();
+    },
+
+    /**
+     * ラウンドタブのコンテンツをレンダリング
+     */
+    renderRoundTab: function() {
+        var contentContainer = document.getElementById('debug-tab-content');
+        if (!contentContainer) return;
+
+        var self = this;
+
+        // 現在のラウンド情報を取得
+        var currentRound = BlockManager.gameState.round;
+        var roundInfo = RoundProgress.getRoundInfo(currentRound);
+        var isBossRound = roundInfo.roundType === 'boss';
+
+        var html = '<div class="debug-round-container">';
+
+        // 現在のラウンド情報表示
+        html += '<div class="debug-section">';
+        html += '<h4 class="debug-section-title">現在のラウンド情報</h4>';
+        html += '<div class="debug-round-info">';
+        html += '<p><strong>ラウンド:</strong> ' + currentRound + '</p>';
+        html += '<p><strong>タイプ:</strong> <span class="round-type-label type-' + roundInfo.roundType + '">' + this.getRoundTypeName(roundInfo.roundType) + '</span></p>';
+        html += '</div>';
+        html += '</div>';
+
+        // ボス条件セクション
+        html += '<div class="debug-section">';
+        html += '<h4 class="debug-section-title">ボスラウンド特殊条件</h4>';
+
+        // ドロップダウン
+        html += '<select id="debug-boss-condition" class="debug-condition-select"' + (isBossRound ? ' disabled' : '') + '>';
+
+        var bossConditions = CONFIG.BOSS_CONDITIONS;
+        for (var i = 0; i < bossConditions.length; i++) {
+            var condition = bossConditions[i];
+            var selected = '';
+            if (BlockManager.gameState.bossCondition &&
+                BlockManager.gameState.bossCondition.id === condition.id) {
+                selected = ' selected';
+            }
+            html += '<option value="' + condition.id + '"' + selected + '>' + condition.icon + ' ' + condition.name + '</option>';
+        }
+        html += '</select>';
+
+        // ボスラウンド中の注意メッセージ
+        if (isBossRound) {
+            html += '<p class="debug-notice">※ボスラウンド中は条件を変更できません</p>';
+        }
+
+        html += '</div>';
+
+        html += '</div>';
+
+        contentContainer.innerHTML = html;
+
+        // ドロップダウンのイベントリスナー
+        var select = document.getElementById('debug-boss-condition');
+        if (select && !isBossRound) {
+            select.addEventListener('change', function() {
+                var selectedCondition = null;
+                for (var i = 0; i < CONFIG.BOSS_CONDITIONS.length; i++) {
+                    if (CONFIG.BOSS_CONDITIONS[i].id === select.value) {
+                        selectedCondition = CONFIG.BOSS_CONDITIONS[i];
+                        break;
+                    }
+                }
+                if (selectedCondition) {
+                    BlockManager.gameState.bossCondition = selectedCondition;
+                    BlockManager.gameState.bossConditionOverridden = true;  // デバッグで上書きフラグをセット
+                    GameUI.updateRoundDisplay();
+                    GameUI.saveGameState();
+                }
+            });
+        }
+    },
+
+    /**
+     * ラウンドタイプ名を取得
+     */
+    getRoundTypeName: function(type) {
+        switch (type) {
+            case 'normal': return '雑魚';
+            case 'elite': return 'エリート';
+            case 'boss': return 'ボス';
+            default: return type;
+        }
     }
 };

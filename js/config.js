@@ -72,5 +72,12 @@ var CONFIG = {
         LABELS: { normal: '雑魚', elite: 'エリート', boss: 'ボス' },
         COLORS: { normal: '#5fa8ff', elite: '#b46eff', boss: '#ef5350' },
         REWARDS: { normal: 5, elite: 7, boss: 10 }
-    }
+    },
+
+    // ボスラウンド特殊条件
+    BOSS_CONDITIONS: [
+        { id: 'obstacle', name: 'おじゃまブロック', icon: '🪨', description: 'ランダムな1マスが埋まっている' },
+        { id: 'energy_save', name: '省エネ', icon: '🔋', description: '配置可能数が9に減少' },
+        { id: 'two_cards', name: '手札2枚', icon: '✌️', description: '手札が2枚になる' }
+    ]
 };
