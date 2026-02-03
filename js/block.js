@@ -5,10 +5,34 @@ var BlockManager = {
     // ゲームステート
     gameState: {
         currentBlocks: [],     // 現在の手札（3つ）
-        round: 1,              // 現在のラウンド
+        round: 0,              // 現在のラウンド（0から開始し、RoundProgress.showで1になる）
         score: 0,              // 現在のスコア
         blocksPlacedCount: 0,  // 現在のラウンドで配置したブロック数
-        roundEnding: false     // ラウンド終了処理中フラグ
+        roundEnding: false,    // ラウンド終了処理中フラグ
+        bossCondition: null,   // ボスラウンドの特殊条件
+        bossConditionOverridden: false  // デバッグで上書きされたかどうか
+    },
+
+    // 現在の最大配置数を取得（ボス条件考慮）
+    getMaxPlacements: function() {
+        var roundInfo = RoundProgress.getRoundInfo(this.gameState.round);
+        if (roundInfo.roundType === 'boss' &&
+            this.gameState.bossCondition &&
+            this.gameState.bossCondition.id === 'energy_save') {
+            return 9;
+        }
+        return CONFIG.GAME.MAX_PLACEMENTS_PER_ROUND;
+    },
+
+    // 現在のドロー枚数を取得（ボス条件考慮）
+    getDrawCount: function() {
+        var roundInfo = RoundProgress.getRoundInfo(this.gameState.round);
+        if (roundInfo.roundType === 'boss' &&
+            this.gameState.bossCondition &&
+            this.gameState.bossCondition.id === 'two_cards') {
+            return 2;
+        }
+        return CONFIG.GAME.DRAW_COUNT;
     },
 
     // ブロックの初期化
@@ -18,8 +42,8 @@ var BlockManager = {
         // 配置カウンターをリセット
         this.gameState.blocksPlacedCount = 0;
 
-        // 最初の3つを引く
-        this.gameState.currentBlocks = DeckManager.draw(CONFIG.GAME.DRAW_COUNT);
+        // 最初のブロックを引く（ボス条件で枚数が変わる）
+        this.gameState.currentBlocks = DeckManager.draw(this.getDrawCount());
         this.render();
 
         // UI更新
@@ -90,15 +114,15 @@ var BlockManager = {
                 GameUI.updatePlacementInfo(this.gameState.blocksPlacedCount, this.gameState.round);
 
                 // 残りの配置可能数が最大配置数に達したかチェック
-                if (this.gameState.blocksPlacedCount >= CONFIG.GAME.MAX_PLACEMENTS_PER_ROUND) {
+                if (this.gameState.blocksPlacedCount >= this.getMaxPlacements()) {
                     // ラウンド終了処理
                     this.gameState.roundEnding = true;
                     GameUI.showRoundEnd(this.gameState.round);
                 } else {
-                    // まだ残りがある場合は次の3つを引く
+                    // まだ残りがある場合は次のブロックを引く
                     const allPlaced = this.gameState.currentBlocks.every(b => b.placed);
                     if (allPlaced) {
-                        this.gameState.currentBlocks = DeckManager.draw(CONFIG.GAME.DRAW_COUNT);
+                        this.gameState.currentBlocks = DeckManager.draw(this.getDrawCount());
                         this.render();
                         // 再度チェック（新しいブロックも置けない場合がある）
                         this.checkGameOver();
@@ -148,18 +172,18 @@ var BlockManager = {
             }
 
             // 最大配置数に達したかチェック
-            if (self.gameState.blocksPlacedCount >= CONFIG.GAME.MAX_PLACEMENTS_PER_ROUND) {
+            if (self.gameState.blocksPlacedCount >= self.getMaxPlacements()) {
                 // ラウンド終了
                 self.gameState.roundEnding = true;
                 GameUI.showRoundEnd(self.gameState.round);
                 return;
             }
 
-            // 3つすべて配置したかチェック
+            // すべて配置したかチェック
             var allPlaced = self.gameState.currentBlocks.every(function(b) { return b.placed; });
             if (allPlaced) {
-                // 次の3つを引く（デッキが尽きても自動的に再シャッフルされる）
-                self.gameState.currentBlocks = DeckManager.draw(CONFIG.GAME.DRAW_COUNT);
+                // 次のブロックを引く（デッキが尽きても自動的に再シャッフルされる）
+                self.gameState.currentBlocks = DeckManager.draw(self.getDrawCount());
                 self.render();
                 // ゲーム状態を保存
                 GameUI.saveGameState();
@@ -176,17 +200,28 @@ var BlockManager = {
     // 次のラウンドを開始
     startNextRound: function() {
         this.gameState.round++;
+
         // スコアをリセット
         GameUI.resetScore();
         // ボードをリセット
         GameBoard.clear();
+
+        // ボスラウンドでおじゃまブロック条件の場合、障害物を配置
+        var roundInfo = RoundProgress.getRoundInfo(this.gameState.round);
+        if (roundInfo.roundType === 'boss' &&
+            this.gameState.bossCondition &&
+            this.gameState.bossCondition.id === 'obstacle') {
+            GameBoard.placeObstacle();
+        }
+
         // デッキをリセット（初期デッキのコピーをシャッフルして再利用）
         DeckManager.reset();
         // 配置カウンターをリセット
         this.gameState.blocksPlacedCount = 0;
         // ラウンド終了フラグをリセット
         this.gameState.roundEnding = false;
-        this.gameState.currentBlocks = DeckManager.draw(CONFIG.GAME.DRAW_COUNT);
+        // ブロックを引く（ボス条件で枚数が変わる）
+        this.gameState.currentBlocks = DeckManager.draw(this.getDrawCount());
         this.render();
         GameUI.updatePlacementInfo(this.gameState.blocksPlacedCount, this.gameState.round);
         GameUI.updateTargetScore(this.gameState.round);

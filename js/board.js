@@ -58,6 +58,28 @@ var GameBoard = {
         });
     },
 
+    // おじゃまブロックをランダムな位置に配置
+    placeObstacle: function() {
+        // ランダムな位置を選択
+        var row = Math.floor(Math.random() * CONFIG.BOARD_SIZE);
+        var col = Math.floor(Math.random() * CONFIG.BOARD_SIZE);
+
+        // セルを埋める（特殊な障害物タイプとして）
+        this.board[row][col] = {
+            filled: true,
+            pattern: 'obstacle',
+            seal: null,
+            buffs: [],
+            blockSetId: null
+        };
+
+        // 見た目を更新
+        var cell = document.querySelector('.cell[data-row="' + row + '"][data-col="' + col + '"]');
+        if (cell) {
+            cell.classList.add('filled', 'obstacle');
+        }
+    },
+
     // 配置可能かチェック
     canPlace: function(row, col, shape) {
         for (var r = 0; r < shape.length; r++) {
@@ -228,12 +250,16 @@ var GameBoard = {
         // アニメーション用のセル配列（順序付き）
         var cellsToAnimate = [];
 
-        // 行のセルを追加（石セルは除外）
+        // 行のセルを追加（石セル・おじゃまブロックは除外）
         rows.forEach(function(row) {
             for (var col = 0; col < CONFIG.BOARD_SIZE; col++) {
                 var cellInfo = self.board[row][col];
                 // 石シールは消えない
                 if (cellInfo && cellInfo.seal === 'stone') {
+                    continue;
+                }
+                // おじゃまブロックも消えない（石シールとは独立した判定）
+                if (cellInfo && cellInfo.pattern === 'obstacle') {
                     continue;
                 }
                 cellsToAnimate.push({
@@ -245,12 +271,16 @@ var GameBoard = {
             }
         });
 
-        // 列のセルを追加（石セルは除外）
+        // 列のセルを追加（石セル・おじゃまブロックは除外）
         cols.forEach(function(col) {
             for (var row = 0; row < CONFIG.BOARD_SIZE; row++) {
                 var cellInfo = self.board[row][col];
                 // 石シールは消えない
                 if (cellInfo && cellInfo.seal === 'stone') {
+                    continue;
+                }
+                // おじゃまブロックも消えない（石シールとは独立した判定）
+                if (cellInfo && cellInfo.pattern === 'obstacle') {
                     continue;
                 }
                 var key = row + '-' + col;

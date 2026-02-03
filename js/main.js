@@ -26,8 +26,9 @@ function initGame() {
         // ゲームオーバーチェック
         BlockManager.checkGameOver();
     } else {
-        // 新規ゲーム開始
-        BlockManager.init();
+        // 新規ゲーム開始 - ラウンド進行ウィンドウを表示
+        DeckManager.init();  // デッキを初期化
+        RoundProgress.show();  // ラウンド進行ウィンドウを表示
     }
 }
 
@@ -49,20 +50,20 @@ function restartGame() {
     GameUI.clearGameState();
 
     // ゲームステートを完全にリセット
-    BlockManager.gameState.round = 1;
+    BlockManager.gameState.round = 0;
     BlockManager.gameState.score = 0;
     BlockManager.gameState.blocksPlacedCount = 0;
     BlockManager.gameState.roundEnding = false;
     BlockManager.gameState.currentBlocks = [];
 
-    // デッキマネージャーを初期化（ショップで追加されたブロックもクリア）
-    DeckManager.init();
-
     // レリックをリセット
     RelicManager.reset();
 
-    // 新しいブロックを生成
-    BlockManager.init();
+    // デッキマネージャーを初期化（ショップで追加されたブロックもクリア）
+    DeckManager.init();
+
+    // ラウンド進行ウィンドウを表示
+    RoundProgress.show();
 }
 
 // リスタートボタンのイベントリスナー
