@@ -11,6 +11,10 @@ function initGame() {
     if (savedState && !savedState.gameState.roundEnding) {
         // 状態を復元
         BlockManager.gameState = savedState.gameState;
+        // 古いセーブデータ互換: stockBlockがundefinedの場合はnullにする
+        if (BlockManager.gameState.stockBlock === undefined) {
+            BlockManager.gameState.stockBlock = null;
+        }
         // 古い形式のボードデータを新形式に変換
         var boardData = GameBoard.convertLegacyBoard(savedState.board);
         GameBoard.setBoard(boardData);
@@ -55,6 +59,7 @@ function restartGame() {
     BlockManager.gameState.blocksPlacedCount = 0;
     BlockManager.gameState.roundEnding = false;
     BlockManager.gameState.currentBlocks = [];
+    BlockManager.gameState.stockBlock = null;
 
     // レリックをリセット
     RelicManager.reset();

@@ -26,6 +26,14 @@ var RelicManager = {
             rarity: 'rare',
             price: 7,
             icon: '⚡'
+        },
+        HAND_STOCK: {
+            id: 'hand_stock',
+            name: '手札ストック',
+            description: 'ブロックセットを1つ保管できるストック枠が出現する',
+            rarity: 'rare',
+            price: 6,
+            icon: '📦'
         }
     },
 
@@ -44,6 +52,10 @@ var RelicManager = {
         if (this.state.ownedRelics.indexOf(relicId) === -1) {
             this.state.ownedRelics.push(relicId);
             this.render();
+            // 手札ストック: ストック枠の表示を更新
+            if (relicId === 'hand_stock') {
+                BlockManager.renderStock();
+            }
             GameUI.saveGameState();
         }
     },
@@ -52,8 +64,16 @@ var RelicManager = {
     removeRelic: function(relicId) {
         var index = this.state.ownedRelics.indexOf(relicId);
         if (index !== -1) {
+            // 手札ストック: 削除前にストックのブロックを手札に戻す
+            if (relicId === 'hand_stock') {
+                BlockManager.returnStockToHand();
+            }
             this.state.ownedRelics.splice(index, 1);
             this.render();
+            // 手札ストック: ストック枠を非表示にする
+            if (relicId === 'hand_stock') {
+                BlockManager.renderStock();
+            }
             GameUI.saveGameState();
         }
     },
