@@ -1305,6 +1305,53 @@
             flex-wrap: wrap;
         }
 
+        /* ストック枠 */
+        #stock-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+            background: rgba(141, 110, 99, 0.3);
+            border-radius: 10px;
+            width: 100%;
+            max-width: 400px;
+            min-height: 80px;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        #stock-container.drag-over {
+            border-color: #aed581;
+            background: rgba(174, 213, 129, 0.2);
+        }
+
+        #stock-label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            font-weight: bold;
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+            letter-spacing: 2px;
+        }
+
+        #stock-slot {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 60px;
+        }
+
+        #stock-slot .block {
+            margin: 0;
+        }
+
+        #stock-slot:empty::after {
+            content: '空き';
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 14px;
+        }
+
         .block {
             display: grid;
             gap: 2px;
@@ -1423,6 +1470,12 @@
                 min-height: 100px;
             }
 
+            #stock-container {
+                max-width: 350px;
+                padding: 8px 12px;
+                min-height: 70px;
+            }
+
             #gold-display {
                 font-size: 16px;
                 padding: 8px 16px;
@@ -1465,6 +1518,12 @@
                 max-width: 300px;
                 padding: 12px;
                 min-height: 90px;
+            }
+
+            #stock-container {
+                max-width: 300px;
+                padding: 6px 10px;
+                min-height: 60px;
             }
 
             #gold-display {
@@ -2352,6 +2411,10 @@
     <div id="game-container">
         <div id="board"></div>
         <div id="blocks-container"></div>
+        <div id="stock-container" style="display: none;">
+            <div id="stock-label">ストック</div>
+            <div id="stock-slot"></div>
+        </div>
     </div>
 
     <div id="score-effect-display"></div>
