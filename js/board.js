@@ -358,12 +358,24 @@ var GameBoard = {
                     totalLines: totalLines,
                     totalBlocks: totalBlocks,
                     placedBlockSize: placedBlockSize,
-                    isBoardEmpty: self.isBoardEmpty()
+                    isBoardEmpty: self.isBoardEmpty(),
+                    rowLines: rows.length,
+                    colLines: cols.length
                 });
 
                 // 連鎖の達人: 複数ライン同時消しで1.5倍
                 if (relicEffects.chainMasterActive) {
                     scoreAmount = Math.floor(scoreAmount * 1.5);
+                }
+
+                // シングルライン: 1ラインのみ消しで3倍
+                if (relicEffects.singleLineActive) {
+                    scoreAmount = scoreAmount * 3;
+                }
+
+                // タケノコ: 縦列のみ揃った時、揃った列数倍
+                if (relicEffects.takenokoActive) {
+                    scoreAmount = scoreAmount * relicEffects.takenokoCols;
                 }
 
                 // 段階的スコア表示（オーラ・苔効果を含む）
@@ -373,6 +385,9 @@ var GameBoard = {
                     auraBonus,
                     mossBonus,
                     relicEffects.chainMasterActive,
+                    relicEffects.singleLineActive,
+                    relicEffects.takenokoActive,
+                    relicEffects.takenokoCols,
                     function() {
                         // スコア加算後にレリックボーナスを適用
                         self.applyRelicBonuses(relicEffects, function() {
