@@ -10,7 +10,8 @@ var BlockManager = {
         blocksPlacedCount: 0,  // 現在のラウンドで配置したブロック数
         roundEnding: false,    // ラウンド終了処理中フラグ
         bossCondition: null,   // ボスラウンドの特殊条件
-        bossConditionOverridden: false  // デバッグで上書きされたかどうか
+        bossConditionOverridden: false,  // デバッグで上書きされたかどうか
+        stockBlock: null       // ストックに保管されたブロック
     },
 
     // 現在の最大配置数を取得（ボス条件考慮）
@@ -68,15 +69,17 @@ var BlockManager = {
                     cellClassName: 'block-cell',
                     pattern: block.pattern,
                     seals: block.seals,
-                    onMouseDown: (e) => InputHandler.startDrag(e, block),
+                    onMouseDown: (e) => InputHandler.startDrag(e, block, 'hand'),
                     onTouchStart: (e) => {
                         e.preventDefault();
-                        InputHandler.startDrag(e.touches[0], block);
+                        InputHandler.startDrag(e.touches[0], block, 'hand');
                     }
                 });
                 container.appendChild(blockElement);
             }
         });
+
+        this.renderStock();
     },
 
     // ブロックが配置可能かチェック
@@ -93,6 +96,19 @@ var BlockManager = {
                 }
             }
         }
+
+        // ストックブロックもチェック
+        if (this.gameState.stockBlock) {
+            var stock = this.gameState.stockBlock;
+            for (var row = 0; row < CONFIG.BOARD_SIZE; row++) {
+                for (var col = 0; col < CONFIG.BOARD_SIZE; col++) {
+                    if (GameBoard.canPlace(row, col, stock.shape)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
         return false;
     },
 
@@ -214,6 +230,8 @@ var BlockManager = {
             GameBoard.placeObstacle();
         }
 
+        // ストック枠をリセット
+        this.gameState.stockBlock = null;
         // デッキをリセット（初期デッキのコピーをシャッフルして再利用）
         DeckManager.reset();
         // 配置カウンターをリセット
@@ -228,6 +246,95 @@ var BlockManager = {
         // ゲーム状態を保存
         GameUI.saveGameState();
         this.checkGameOver();
+    },
+
+    // ブロックをストックに移動（手札→ストック、既にあればスワップ）
+    moveToStock: function(block) {
+        var previousStock = this.gameState.stockBlock;
+
+        // ストックにブロックを保管
+        this.gameState.stockBlock = block;
+
+        // 手札から削除（placedにする）
+        block.placed = true;
+
+        // 既にストックにブロックがあった場合はスワップ（手札に戻す）
+        if (previousStock) {
+            previousStock.placed = false;
+            // currentBlocksに既にあるか確認し、なければ追加
+            var found = false;
+            for (var i = 0; i < this.gameState.currentBlocks.length; i++) {
+                if (this.gameState.currentBlocks[i].id === previousStock.id) {
+                    found = true;
+                    this.gameState.currentBlocks[i] = previousStock;
+                    break;
+                }
+            }
+            if (!found) {
+                this.gameState.currentBlocks.push(previousStock);
+            }
+        }
+
+        this.render();
+
+        // 手札が全て配置済みの場合、新しい手札をドロー
+        var allPlaced = this.gameState.currentBlocks.every(function(b) { return b.placed; });
+        if (allPlaced && this.gameState.blocksPlacedCount < this.getMaxPlacements()) {
+            this.gameState.currentBlocks = DeckManager.draw(this.getDrawCount());
+            this.render();
+        }
+
+        GameUI.saveGameState();
+        this.checkGameOver();
+    },
+
+    // ストックから手札にブロックを戻す（レリック削除時）
+    returnStockToHand: function() {
+        if (!this.gameState.stockBlock) return;
+
+        var stock = this.gameState.stockBlock;
+        stock.placed = false;
+        this.gameState.stockBlock = null;
+
+        // 手札に追加
+        this.gameState.currentBlocks.push(stock);
+        this.render();
+        GameUI.saveGameState();
+    },
+
+    // ストック枠のレンダリング
+    renderStock: function() {
+        var container = document.getElementById('stock-container');
+        var slot = document.getElementById('stock-slot');
+        if (!container || !slot) return;
+
+        // レリック所持チェック
+        if (!RelicManager.hasRelic('hand_stock')) {
+            container.style.display = 'none';
+            return;
+        }
+
+        container.style.display = 'flex';
+        slot.innerHTML = '';
+
+        if (this.gameState.stockBlock) {
+            var block = this.gameState.stockBlock;
+            var blockElement = BlockRenderer.createBlockElement({
+                shape: block.shape,
+                blockId: block.id,
+                cellSize: CONFIG.CELL_SIZE.DEFAULT,
+                className: 'block',
+                cellClassName: 'block-cell',
+                pattern: block.pattern,
+                seals: block.seals,
+                onMouseDown: function(e) { InputHandler.startDrag(e, block, 'stock'); },
+                onTouchStart: function(e) {
+                    e.preventDefault();
+                    InputHandler.startDrag(e.touches[0], block, 'stock');
+                }
+            });
+            slot.appendChild(blockElement);
+        }
     },
 
     // ショップで選択されたブロックをデッキに追加
