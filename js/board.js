@@ -383,6 +383,11 @@ var GameBoard = {
                     scoreAmount = scoreAmount * relicEffects.kaniRows;
                 }
 
+                // のびのびタケノコ: 縦列のみ揃えるたびに倍率上昇
+                if (relicEffects.nobiTakenokoActive) {
+                    scoreAmount = Math.floor(scoreAmount * relicEffects.nobiTakenokoMultiplier);
+                }
+
                 // 段階的スコア表示（オーラ・苔効果を含む）
                 GameUI.showPatternScoreCalculation(
                     baseBlocks,
@@ -395,6 +400,8 @@ var GameBoard = {
                     relicEffects.takenokoCols,
                     relicEffects.kaniActive,
                     relicEffects.kaniRows,
+                    relicEffects.nobiTakenokoActive,
+                    relicEffects.nobiTakenokoMultiplier,
                     function() {
                         // スコア加算後にレリックボーナスを適用
                         self.applyRelicBonuses(relicEffects, function() {
