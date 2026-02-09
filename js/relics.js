@@ -58,12 +58,21 @@ var RelicManager = {
             rarity: 'common',
             price: 4,
             icon: '🦀'
+        },
+        NOBI_TAKENOKO: {
+            id: 'nobi_takenoko',
+            name: 'のびのびタケノコ',
+            description: '縦列のみ揃えるたびに倍率が0.5ずつ上昇（横列消しでリセット）',
+            rarity: 'rare',
+            price: 7,
+            icon: '🎋'
         }
     },
 
     // 状態管理
     state: {
-        ownedRelics: []  // 所持レリックIDのリスト
+        ownedRelics: [],  // 所持レリックIDのリスト
+        nobiTakenokoMultiplier: 1.0  // のびのびタケノコの現在倍率
     },
 
     // 初期化
@@ -189,7 +198,12 @@ var RelicManager = {
         if (!tooltip || !nameEl || !descEl || !rarityEl) return;
 
         nameEl.textContent = relic.icon + ' ' + relic.name;
-        descEl.textContent = relic.description;
+        var descText = relic.description;
+        // のびのびタケノコ: 現在の倍率を表示
+        if (relicId === 'nobi_takenoko') {
+            descText += '（現在の倍率: ×' + this.state.nobiTakenokoMultiplier + '）';
+        }
+        descEl.textContent = descText;
 
         var rarityText = {
             'common': 'コモン',
@@ -241,12 +255,16 @@ var RelicManager = {
         if (stateData && stateData.ownedRelics) {
             this.state.ownedRelics = stateData.ownedRelics;
         }
+        if (stateData && stateData.nobiTakenokoMultiplier !== undefined) {
+            this.state.nobiTakenokoMultiplier = stateData.nobiTakenokoMultiplier;
+        }
         this.render();
     },
 
     // 状態リセット
     reset: function() {
         this.state.ownedRelics = [];
+        this.state.nobiTakenokoMultiplier = 1.0;
         this.render();
     },
 
@@ -261,7 +279,9 @@ var RelicManager = {
             takenokoActive: false,
             takenokoCols: 0,
             kaniActive: false,
-            kaniRows: 0
+            kaniRows: 0,
+            nobiTakenokoActive: false,
+            nobiTakenokoMultiplier: 1.0
         };
 
         // 連鎖の達人: 複数行列を同時消しで1.5倍
@@ -294,6 +314,19 @@ var RelicManager = {
         if (this.hasRelic('kani') && params.colLines === 0 && params.rowLines >= 1) {
             effects.kaniActive = true;
             effects.kaniRows = params.rowLines;
+        }
+
+        // のびのびタケノコ: 倍率管理（横列クリアでリセット、縦列のみで成長）
+        if (this.hasRelic('nobi_takenoko')) {
+            if (params.rowLines >= 1) {
+                // 横列が揃った → 倍率リセット
+                this.state.nobiTakenokoMultiplier = 1.0;
+            } else if (params.rowLines === 0 && params.colLines >= 1) {
+                // 縦列のみ → 倍率を+0.5してから適用
+                this.state.nobiTakenokoMultiplier += 0.5;
+                effects.nobiTakenokoActive = true;
+                effects.nobiTakenokoMultiplier = this.state.nobiTakenokoMultiplier;
+            }
         }
 
         return effects;
