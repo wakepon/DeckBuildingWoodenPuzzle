@@ -230,9 +230,10 @@ var BlockManager = {
             GameBoard.placeObstacle();
         }
 
-        // のびのびタケノコ・のびのびカニの倍率をリセット
+        // のびのびタケノコ・のびのびカニ・連射の倍率をリセット
         RelicManager.state.nobiTakenokoMultiplier = 1.0;
         RelicManager.state.nobiKaniMultiplier = 1.0;
+        RelicManager.state.renshaMultiplier = 1.0;
         // ストック枠をリセット
         this.gameState.stockBlock = null;
         // デッキをリセット（初期デッキのコピーをシャッフルして再利用）
