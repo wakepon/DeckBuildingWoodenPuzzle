@@ -235,6 +235,10 @@ var GameBoard = {
         if (rowsToClear.length > 0 || colsToClear.length > 0) {
             this.clearLines(rowsToClear, colsToClear, onComplete, placedBlockSize);
         } else {
+            // 連射: ラインが揃わなかった場合、倍率をリセット
+            if (RelicManager.hasRelic('rensha')) {
+                RelicManager.state.renshaMultiplier = 1.0;
+            }
             if (onComplete) {
                 onComplete();
             }
@@ -393,6 +397,11 @@ var GameBoard = {
                     scoreAmount = Math.floor(scoreAmount * relicEffects.nobiKaniMultiplier);
                 }
 
+                // 連射: ラインが揃うたびに倍率上昇
+                if (relicEffects.renshaActive) {
+                    scoreAmount = Math.floor(scoreAmount * relicEffects.renshaMultiplier);
+                }
+
                 // 段階的スコア表示（オーラ・苔効果を含む）
                 GameUI.showPatternScoreCalculation(
                     baseBlocks,
@@ -409,6 +418,8 @@ var GameBoard = {
                     relicEffects.nobiTakenokoMultiplier,
                     relicEffects.nobiKaniActive,
                     relicEffects.nobiKaniMultiplier,
+                    relicEffects.renshaActive,
+                    relicEffects.renshaMultiplier,
                     function() {
                         // スコア加算後にレリックボーナスを適用
                         self.applyRelicBonuses(relicEffects, function() {
