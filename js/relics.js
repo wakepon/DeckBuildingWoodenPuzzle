@@ -34,6 +34,22 @@ var RelicManager = {
             rarity: 'rare',
             price: 6,
             icon: '📦'
+        },
+        SINGLE_LINE: {
+            id: 'single_line',
+            name: 'シングルライン',
+            description: '1行または1列のみ消した時、スコアが3倍になる',
+            rarity: 'common',
+            price: 4,
+            icon: '1️⃣'
+        },
+        TAKENOKO: {
+            id: 'takenoko',
+            name: 'タケノコ',
+            description: '縦列のみ揃った時、スコアが揃った列数倍になる',
+            rarity: 'common',
+            price: 4,
+            icon: '🎍'
         }
     },
 
@@ -231,13 +247,21 @@ var RelicManager = {
     calculateRelicEffects: function(params) {
         var effects = {
             chainMasterActive: false,
+            singleLineActive: false,
             smallLuckActive: false,
-            fullClearActive: false
+            fullClearActive: false,
+            takenokoActive: false,
+            takenokoCols: 0
         };
 
         // 連鎖の達人: 複数行列を同時消しで1.5倍
         if (this.hasRelic('chain_master') && params.totalLines >= 2) {
             effects.chainMasterActive = true;
+        }
+
+        // シングルライン: 1ラインのみ消しで3倍
+        if (this.hasRelic('single_line') && params.totalLines === 1) {
+            effects.singleLineActive = true;
         }
 
         // 小さな幸運: 3ブロックのピースでライン消し
@@ -248,6 +272,12 @@ var RelicManager = {
         // 全消しボーナス: 盤面が完全に空
         if (this.hasRelic('full_clear_bonus') && params.isBoardEmpty) {
             effects.fullClearActive = true;
+        }
+
+        // タケノコ: 縦列のみ揃った時、揃った列数倍
+        if (this.hasRelic('takenoko') && params.rowLines === 0 && params.colLines >= 1) {
+            effects.takenokoActive = true;
+            effects.takenokoCols = params.colLines;
         }
 
         return effects;
