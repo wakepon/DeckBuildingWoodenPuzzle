@@ -378,6 +378,11 @@ var GameBoard = {
                     scoreAmount = scoreAmount * relicEffects.takenokoCols;
                 }
 
+                // カニ: 横列のみ揃った時、揃った行数倍
+                if (relicEffects.kaniActive) {
+                    scoreAmount = scoreAmount * relicEffects.kaniRows;
+                }
+
                 // 段階的スコア表示（オーラ・苔効果を含む）
                 GameUI.showPatternScoreCalculation(
                     baseBlocks,
@@ -388,6 +393,8 @@ var GameBoard = {
                     relicEffects.singleLineActive,
                     relicEffects.takenokoActive,
                     relicEffects.takenokoCols,
+                    relicEffects.kaniActive,
+                    relicEffects.kaniRows,
                     function() {
                         // スコア加算後にレリックボーナスを適用
                         self.applyRelicBonuses(relicEffects, function() {

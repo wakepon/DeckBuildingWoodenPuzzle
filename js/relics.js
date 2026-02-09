@@ -50,6 +50,14 @@ var RelicManager = {
             rarity: 'common',
             price: 4,
             icon: '🎍'
+        },
+        KANI: {
+            id: 'kani',
+            name: 'カニ',
+            description: '横列のみ揃った時、スコアが揃った行数倍になる',
+            rarity: 'common',
+            price: 4,
+            icon: '🦀'
         }
     },
 
@@ -251,7 +259,9 @@ var RelicManager = {
             smallLuckActive: false,
             fullClearActive: false,
             takenokoActive: false,
-            takenokoCols: 0
+            takenokoCols: 0,
+            kaniActive: false,
+            kaniRows: 0
         };
 
         // 連鎖の達人: 複数行列を同時消しで1.5倍
@@ -278,6 +288,12 @@ var RelicManager = {
         if (this.hasRelic('takenoko') && params.rowLines === 0 && params.colLines >= 1) {
             effects.takenokoActive = true;
             effects.takenokoCols = params.colLines;
+        }
+
+        // カニ: 横列のみ揃った時、揃った行数倍
+        if (this.hasRelic('kani') && params.colLines === 0 && params.rowLines >= 1) {
+            effects.kaniActive = true;
+            effects.kaniRows = params.rowLines;
         }
 
         return effects;
