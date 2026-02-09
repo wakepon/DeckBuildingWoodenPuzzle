@@ -66,13 +66,22 @@ var RelicManager = {
             rarity: 'rare',
             price: 7,
             icon: '🎋'
+        },
+        NOBI_KANI: {
+            id: 'nobi_kani',
+            name: 'のびのびカニ',
+            description: '横列のみ揃えるたびに倍率が0.5ずつ上昇（縦列消しでリセット）',
+            rarity: 'rare',
+            price: 7,
+            icon: '🦀'
         }
     },
 
     // 状態管理
     state: {
         ownedRelics: [],  // 所持レリックIDのリスト
-        nobiTakenokoMultiplier: 1.0  // のびのびタケノコの現在倍率
+        nobiTakenokoMultiplier: 1.0,  // のびのびタケノコの現在倍率
+        nobiKaniMultiplier: 1.0  // のびのびカニの現在倍率
     },
 
     // 初期化
@@ -203,6 +212,10 @@ var RelicManager = {
         if (relicId === 'nobi_takenoko') {
             descText += '（現在の倍率: ×' + this.state.nobiTakenokoMultiplier + '）';
         }
+        // のびのびカニ: 現在の倍率を表示
+        if (relicId === 'nobi_kani') {
+            descText += '（現在の倍率: ×' + this.state.nobiKaniMultiplier + '）';
+        }
         descEl.textContent = descText;
 
         var rarityText = {
@@ -258,6 +271,9 @@ var RelicManager = {
         if (stateData && stateData.nobiTakenokoMultiplier !== undefined) {
             this.state.nobiTakenokoMultiplier = stateData.nobiTakenokoMultiplier;
         }
+        if (stateData && stateData.nobiKaniMultiplier !== undefined) {
+            this.state.nobiKaniMultiplier = stateData.nobiKaniMultiplier;
+        }
         this.render();
     },
 
@@ -265,6 +281,7 @@ var RelicManager = {
     reset: function() {
         this.state.ownedRelics = [];
         this.state.nobiTakenokoMultiplier = 1.0;
+        this.state.nobiKaniMultiplier = 1.0;
         this.render();
     },
 
@@ -281,7 +298,9 @@ var RelicManager = {
             kaniActive: false,
             kaniRows: 0,
             nobiTakenokoActive: false,
-            nobiTakenokoMultiplier: 1.0
+            nobiTakenokoMultiplier: 1.0,
+            nobiKaniActive: false,
+            nobiKaniMultiplier: 1.0
         };
 
         // 連鎖の達人: 複数行列を同時消しで1.5倍
@@ -326,6 +345,19 @@ var RelicManager = {
                 this.state.nobiTakenokoMultiplier += 0.5;
                 effects.nobiTakenokoActive = true;
                 effects.nobiTakenokoMultiplier = this.state.nobiTakenokoMultiplier;
+            }
+        }
+
+        // のびのびカニ: 倍率管理（縦列クリアでリセット、横列のみで成長）
+        if (this.hasRelic('nobi_kani')) {
+            if (params.colLines >= 1) {
+                // 縦列が揃った → 倍率リセット
+                this.state.nobiKaniMultiplier = 1.0;
+            } else if (params.colLines === 0 && params.rowLines >= 1) {
+                // 横列のみ → 倍率を+0.5してから適用
+                this.state.nobiKaniMultiplier += 0.5;
+                effects.nobiKaniActive = true;
+                effects.nobiKaniMultiplier = this.state.nobiKaniMultiplier;
             }
         }
 
