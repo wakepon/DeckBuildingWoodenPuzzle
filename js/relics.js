@@ -74,6 +74,14 @@ var RelicManager = {
             rarity: 'rare',
             price: 7,
             icon: '🦀'
+        },
+        RENSHA: {
+            id: 'rensha',
+            name: '連射',
+            description: '行・列が揃うたびにスコア倍率が0.5ずつ上昇（揃わないとリセット）',
+            rarity: 'rare',
+            price: 7,
+            icon: '🔫'
         }
     },
 
@@ -81,7 +89,8 @@ var RelicManager = {
     state: {
         ownedRelics: [],  // 所持レリックIDのリスト
         nobiTakenokoMultiplier: 1.0,  // のびのびタケノコの現在倍率
-        nobiKaniMultiplier: 1.0  // のびのびカニの現在倍率
+        nobiKaniMultiplier: 1.0,  // のびのびカニの現在倍率
+        renshaMultiplier: 1.0  // 連射の現在倍率
     },
 
     // 初期化
@@ -216,6 +225,10 @@ var RelicManager = {
         if (relicId === 'nobi_kani') {
             descText += '（現在の倍率: ×' + this.state.nobiKaniMultiplier + '）';
         }
+        // 連射: 次回の倍率を表示
+        if (relicId === 'rensha') {
+            descText += '（次回の倍率: ×' + this.state.renshaMultiplier + '）';
+        }
         descEl.textContent = descText;
 
         var rarityText = {
@@ -274,6 +287,9 @@ var RelicManager = {
         if (stateData && stateData.nobiKaniMultiplier !== undefined) {
             this.state.nobiKaniMultiplier = stateData.nobiKaniMultiplier;
         }
+        if (stateData && stateData.renshaMultiplier !== undefined) {
+            this.state.renshaMultiplier = stateData.renshaMultiplier;
+        }
         this.render();
     },
 
@@ -282,6 +298,7 @@ var RelicManager = {
         this.state.ownedRelics = [];
         this.state.nobiTakenokoMultiplier = 1.0;
         this.state.nobiKaniMultiplier = 1.0;
+        this.state.renshaMultiplier = 1.0;
         this.render();
     },
 
@@ -300,7 +317,9 @@ var RelicManager = {
             nobiTakenokoActive: false,
             nobiTakenokoMultiplier: 1.0,
             nobiKaniActive: false,
-            nobiKaniMultiplier: 1.0
+            nobiKaniMultiplier: 1.0,
+            renshaActive: false,
+            renshaMultiplier: 1.0
         };
 
         // 連鎖の達人: 複数行列を同時消しで1.5倍
@@ -359,6 +378,14 @@ var RelicManager = {
                 effects.nobiKaniActive = true;
                 effects.nobiKaniMultiplier = this.state.nobiKaniMultiplier;
             }
+        }
+
+        // 連射: ラインが揃えば現在の倍率を適用し、その後倍率を+0.5
+        if (this.hasRelic('rensha') && params.totalLines >= 1) {
+            effects.renshaActive = true;
+            effects.renshaMultiplier = this.state.renshaMultiplier;
+            // 倍率を適用した後にインクリメント（次回用）
+            this.state.renshaMultiplier += 0.5;
         }
 
         return effects;
