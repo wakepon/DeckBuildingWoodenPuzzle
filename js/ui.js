@@ -71,7 +71,7 @@ var GameUI = {
     },
 
     // パターン効果付きスコア計算演出（段階的表示）
-    showPatternScoreCalculation: function(baseBlocks, totalLines, auraBonus, mossBonus, chainMasterActive, singleLineActive, takenokoActive, takenokoCols, kaniActive, kaniRows, nobiTakenokoActive, nobiTakenokoMultiplier, callback) {
+    showPatternScoreCalculation: function(baseBlocks, totalLines, auraBonus, mossBonus, chainMasterActive, singleLineActive, takenokoActive, takenokoCols, kaniActive, kaniRows, nobiTakenokoActive, nobiTakenokoMultiplier, nobiKaniActive, nobiKaniMultiplier, callback) {
         var self = this;
         var display = document.getElementById('score-effect-display');
         if (!display) {
@@ -91,6 +91,9 @@ var GameUI = {
             }
             if (nobiTakenokoActive) {
                 finalScore = Math.floor(finalScore * nobiTakenokoMultiplier);
+            }
+            if (nobiKaniActive) {
+                finalScore = Math.floor(finalScore * nobiKaniMultiplier);
             }
             this.animateScoreIncrement(finalScore, callback);
             return;
@@ -112,19 +115,19 @@ var GameUI = {
                     if (mossBonus > 0) {
                         self.showBonusAddition(display, currentTotal, mossBonus, '苔', '🌿', function() {
                             currentTotal += mossBonus;
-                            self.showFinalScore(display, currentTotal, totalLines, chainMasterActive, singleLineActive, takenokoActive, takenokoCols, kaniActive, kaniRows, nobiTakenokoActive, nobiTakenokoMultiplier, callback);
+                            self.showFinalScore(display, currentTotal, totalLines, chainMasterActive, singleLineActive, takenokoActive, takenokoCols, kaniActive, kaniRows, nobiTakenokoActive, nobiTakenokoMultiplier, nobiKaniActive, nobiKaniMultiplier, callback);
                         });
                     } else {
-                        self.showFinalScore(display, currentTotal, totalLines, chainMasterActive, singleLineActive, takenokoActive, takenokoCols, kaniActive, kaniRows, nobiTakenokoActive, nobiTakenokoMultiplier, callback);
+                        self.showFinalScore(display, currentTotal, totalLines, chainMasterActive, singleLineActive, takenokoActive, takenokoCols, kaniActive, kaniRows, nobiTakenokoActive, nobiTakenokoMultiplier, nobiKaniActive, nobiKaniMultiplier, callback);
                     }
                 });
             } else if (mossBonus > 0) {
                 self.showBonusAddition(display, currentTotal, mossBonus, '苔', '🌿', function() {
                     currentTotal += mossBonus;
-                    self.showFinalScore(display, currentTotal, totalLines, chainMasterActive, singleLineActive, takenokoActive, takenokoCols, kaniActive, kaniRows, nobiTakenokoActive, nobiTakenokoMultiplier, callback);
+                    self.showFinalScore(display, currentTotal, totalLines, chainMasterActive, singleLineActive, takenokoActive, takenokoCols, kaniActive, kaniRows, nobiTakenokoActive, nobiTakenokoMultiplier, nobiKaniActive, nobiKaniMultiplier, callback);
                 });
             } else {
-                self.showFinalScore(display, currentTotal, totalLines, chainMasterActive, singleLineActive, takenokoActive, takenokoCols, kaniActive, kaniRows, nobiTakenokoActive, nobiTakenokoMultiplier, callback);
+                self.showFinalScore(display, currentTotal, totalLines, chainMasterActive, singleLineActive, takenokoActive, takenokoCols, kaniActive, kaniRows, nobiTakenokoActive, nobiTakenokoMultiplier, nobiKaniActive, nobiKaniMultiplier, callback);
             }
         }, 1500);
     },
@@ -136,12 +139,12 @@ var GameUI = {
     },
 
     // 最終スコア表示とスコア加算
-    showFinalScore: function(display, totalBlocks, totalLines, chainMasterActive, singleLineActive, takenokoActive, takenokoCols, kaniActive, kaniRows, nobiTakenokoActive, nobiTakenokoMultiplier, callback) {
+    showFinalScore: function(display, totalBlocks, totalLines, chainMasterActive, singleLineActive, takenokoActive, takenokoCols, kaniActive, kaniRows, nobiTakenokoActive, nobiTakenokoMultiplier, nobiKaniActive, nobiKaniMultiplier, callback) {
         var self = this;
         var finalScore = totalBlocks * totalLines;
         var baseScore = finalScore;
 
-        // 倍率の適用順序: 連鎖の達人 → シングルライン → タケノコ → カニ → のびのびタケノコ
+        // 倍率の適用順序: 連鎖の達人 → シングルライン → タケノコ → カニ → のびのびタケノコ → のびのびカニ
         if (chainMasterActive) {
             finalScore = Math.floor(finalScore * 1.5);
         }
@@ -156,6 +159,9 @@ var GameUI = {
         }
         if (nobiTakenokoActive) {
             finalScore = Math.floor(finalScore * nobiTakenokoMultiplier);
+        }
+        if (nobiKaniActive) {
+            finalScore = Math.floor(finalScore * nobiKaniMultiplier);
         }
 
         // 倍率ステップを構築（ラベルと中間スコアのペア）
@@ -180,6 +186,10 @@ var GameUI = {
         if (nobiTakenokoActive) {
             runningScore = Math.floor(runningScore * nobiTakenokoMultiplier);
             steps.push({ label: '×' + nobiTakenokoMultiplier + ' のびのびタケノコ', score: runningScore });
+        }
+        if (nobiKaniActive) {
+            runningScore = Math.floor(runningScore * nobiKaniMultiplier);
+            steps.push({ label: '×' + nobiKaniMultiplier + ' のびのびカニ', score: runningScore });
         }
 
         if (steps.length === 0) {
