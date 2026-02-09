@@ -388,6 +388,11 @@ var GameBoard = {
                     scoreAmount = Math.floor(scoreAmount * relicEffects.nobiTakenokoMultiplier);
                 }
 
+                // のびのびカニ: 横列のみ揃えるたびに倍率上昇
+                if (relicEffects.nobiKaniActive) {
+                    scoreAmount = Math.floor(scoreAmount * relicEffects.nobiKaniMultiplier);
+                }
+
                 // 段階的スコア表示（オーラ・苔効果を含む）
                 GameUI.showPatternScoreCalculation(
                     baseBlocks,
@@ -402,6 +407,8 @@ var GameBoard = {
                     relicEffects.kaniRows,
                     relicEffects.nobiTakenokoActive,
                     relicEffects.nobiTakenokoMultiplier,
+                    relicEffects.nobiKaniActive,
+                    relicEffects.nobiKaniMultiplier,
                     function() {
                         // スコア加算後にレリックボーナスを適用
                         self.applyRelicBonuses(relicEffects, function() {
