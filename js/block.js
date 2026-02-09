@@ -230,6 +230,8 @@ var BlockManager = {
             GameBoard.placeObstacle();
         }
 
+        // のびのびタケノコの倍率をリセット
+        RelicManager.state.nobiTakenokoMultiplier = 1.0;
         // ストック枠をリセット
         this.gameState.stockBlock = null;
         // デッキをリセット（初期デッキのコピーをシャッフルして再利用）
