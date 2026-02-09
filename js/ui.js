@@ -71,7 +71,7 @@ var GameUI = {
     },
 
     // パターン効果付きスコア計算演出（段階的表示）
-    showPatternScoreCalculation: function(baseBlocks, totalLines, auraBonus, mossBonus, chainMasterActive, callback) {
+    showPatternScoreCalculation: function(baseBlocks, totalLines, auraBonus, mossBonus, chainMasterActive, singleLineActive, takenokoActive, takenokoCols, callback) {
         var self = this;
         var display = document.getElementById('score-effect-display');
         if (!display) {
@@ -79,6 +79,12 @@ var GameUI = {
             var finalScore = totalBlocks * totalLines;
             if (chainMasterActive) {
                 finalScore = Math.floor(finalScore * 1.5);
+            }
+            if (singleLineActive) {
+                finalScore = finalScore * 3;
+            }
+            if (takenokoActive) {
+                finalScore = finalScore * takenokoCols;
             }
             this.animateScoreIncrement(finalScore, callback);
             return;
@@ -100,19 +106,19 @@ var GameUI = {
                     if (mossBonus > 0) {
                         self.showBonusAddition(display, currentTotal, mossBonus, '苔', '🌿', function() {
                             currentTotal += mossBonus;
-                            self.showFinalScore(display, currentTotal, totalLines, chainMasterActive, callback);
+                            self.showFinalScore(display, currentTotal, totalLines, chainMasterActive, singleLineActive, takenokoActive, takenokoCols, callback);
                         });
                     } else {
-                        self.showFinalScore(display, currentTotal, totalLines, chainMasterActive, callback);
+                        self.showFinalScore(display, currentTotal, totalLines, chainMasterActive, singleLineActive, takenokoActive, takenokoCols, callback);
                     }
                 });
             } else if (mossBonus > 0) {
                 self.showBonusAddition(display, currentTotal, mossBonus, '苔', '🌿', function() {
                     currentTotal += mossBonus;
-                    self.showFinalScore(display, currentTotal, totalLines, chainMasterActive, callback);
+                    self.showFinalScore(display, currentTotal, totalLines, chainMasterActive, singleLineActive, takenokoActive, takenokoCols, callback);
                 });
             } else {
-                self.showFinalScore(display, currentTotal, totalLines, chainMasterActive, callback);
+                self.showFinalScore(display, currentTotal, totalLines, chainMasterActive, singleLineActive, takenokoActive, takenokoCols, callback);
             }
         }, 1500);
     },
@@ -124,13 +130,56 @@ var GameUI = {
     },
 
     // 最終スコア表示とスコア加算
-    showFinalScore: function(display, totalBlocks, totalLines, chainMasterActive, callback) {
+    showFinalScore: function(display, totalBlocks, totalLines, chainMasterActive, singleLineActive, takenokoActive, takenokoCols, callback) {
         var self = this;
         var finalScore = totalBlocks * totalLines;
+        var baseScore = finalScore;
 
+        // 倍率の適用順序: 連鎖の達人 → シングルライン → タケノコ
         if (chainMasterActive) {
-            display.innerHTML = totalBlocks + ' × ' + totalLines + '<br>=<br>' + (totalBlocks * totalLines) + '<br>×1.5 連鎖の達人';
             finalScore = Math.floor(finalScore * 1.5);
+        }
+        if (singleLineActive) {
+            finalScore = finalScore * 3;
+        }
+        if (takenokoActive) {
+            finalScore = finalScore * takenokoCols;
+        }
+
+        if (chainMasterActive && takenokoActive) {
+            // 連鎖の達人 + タケノコ同時発動
+            var afterChain = Math.floor(baseScore * 1.5);
+            display.innerHTML = totalBlocks + ' × ' + totalLines + '<br>=<br>' + baseScore + '<br>×1.5 連鎖の達人';
+            setTimeout(function() {
+                display.innerHTML = '=' + afterChain + '<br>×' + takenokoCols + ' タケノコ';
+                setTimeout(function() {
+                    display.innerHTML = '=' + finalScore;
+                    setTimeout(function() {
+                        self.animateScoreIncrement(finalScore, callback);
+                        display.classList.remove('show');
+                    }, 800);
+                }, 1000);
+            }, 1000);
+        } else if (chainMasterActive) {
+            display.innerHTML = totalBlocks + ' × ' + totalLines + '<br>=<br>' + baseScore + '<br>×1.5 連鎖の達人';
+            setTimeout(function() {
+                display.innerHTML = '=' + finalScore;
+                setTimeout(function() {
+                    self.animateScoreIncrement(finalScore, callback);
+                    display.classList.remove('show');
+                }, 800);
+            }, 1000);
+        } else if (singleLineActive) {
+            display.innerHTML = totalBlocks + ' × ' + totalLines + '<br>=<br>' + baseScore + '<br>×3 シングルライン';
+            setTimeout(function() {
+                display.innerHTML = '=' + finalScore;
+                setTimeout(function() {
+                    self.animateScoreIncrement(finalScore, callback);
+                    display.classList.remove('show');
+                }, 800);
+            }, 1000);
+        } else if (takenokoActive) {
+            display.innerHTML = totalBlocks + ' × ' + totalLines + '<br>=<br>' + baseScore + '<br>×' + takenokoCols + ' タケノコ';
             setTimeout(function() {
                 display.innerHTML = '=' + finalScore;
                 setTimeout(function() {
